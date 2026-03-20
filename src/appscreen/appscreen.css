@@ -247,6 +247,7 @@ html.electron-app #settings-btn {
 }
 
 .screenshot-name {
+    display: block;
     font-size: 13px;
     font-weight: 500;
     white-space: nowrap;
@@ -255,6 +256,7 @@ html.electron-app #settings-btn {
 }
 
 .screenshot-device {
+    display: block;
     font-size: 11px;
     color: var(--text-secondary);
     margin-top: 2px;

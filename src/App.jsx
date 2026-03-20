@@ -64,8 +64,8 @@ function App() {
             </div>
           </header>
 
-          <main className="flex-1 p-6 md:p-8 lg:p-10">
-            <div className={`mx-auto space-y-8 ${appState.activePage === 'screenshots' ? 'w-full max-w-none' : 'max-w-6xl'}`}>
+          <main className={`flex-1 min-h-0 ${appState.activePage === 'screenshots' ? '' : 'p-6 md:p-8 lg:p-10'}`}>
+            <div className={`mx-auto ${appState.activePage === 'screenshots' ? 'w-full max-w-none h-full' : 'max-w-6xl space-y-8'}`}>
               {appState.activePage === 'appstore' && (
                 <AppStoreConnect
                   credentials={appState.ascCredentials}
@@ -83,7 +83,7 @@ function App() {
                 />
               )}
 
-              <div className={appState.activePage === 'screenshots' ? 'space-y-6' : 'hidden'}>
+              <div className={appState.activePage === 'screenshots' ? 'h-full' : 'hidden'}>
                 <ScreenshotMaker
                   localizationPayload={screenshot.screenshotLocalizationPayload}
                   aiConfig={appState.providerConfig}

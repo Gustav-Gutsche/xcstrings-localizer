@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>xcstrings Translator — Translate Xcode String Catalogs</title>
+<meta name="description" content="Free xcstrings translator for Xcode String Catalogs. Translate Localizable.xcstrings into 40+ languages with AI — placeholders and plurals stay intact." />
+<link rel="canonical" href="https://storelocalizer.com/xcstrings-translator.html" />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="xcstrings Translator — Translate Xcode String Catalogs" />
+<meta property="og:description" content="Free xcstrings translator for Xcode String Catalogs. Translate Localizable.xcstrings into 40+ languages with AI, keeping placeholders, plurals and brand words intact." />
+<meta property="og:url" content="https://storelocalizer.com/xcstrings-translator.html" />
+<meta property="og:image" content="https://storelocalizer.com/og.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="xcstrings Translator — Translate Xcode String Catalogs" />
+<meta name="twitter:description" content="Free xcstrings translator for Xcode String Catalogs. Translate Localizable.xcstrings into 40+ languages with AI, keeping placeholders and plurals intact." />
+<meta name="twitter:image" content="https://storelocalizer.com/og.png" />
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg:#0a0a0a;--card:#141414;--text:#e5e5e5;--muted:#a1a1aa;--accent:#7c3aed;--accent2:#8b5cf6;--border:#262626}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.6}
+  a{color:var(--accent2);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:880px;margin:0 auto;padding:0 20px}
+  header.site{position:sticky;top:0;z-index:10;background:rgba(10,10,10,.8);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+  header.site .wrap{display:flex;align-items:center;gap:20px;height:60px}
+  .logo{font-weight:700;font-size:18px;color:var(--text)}
+  nav.top{display:flex;gap:18px;flex-wrap:wrap;margin-left:auto;font-size:14px}nav.top a{color:var(--muted)}
+  .hero{padding:72px 0 48px;text-align:center}
+  .hero h1{font-size:40px;line-height:1.15;font-weight:800;letter-spacing:-.02em;margin-bottom:18px;background:linear-gradient(135deg,#fff,#a78bfa);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero p.sub{font-size:19px;color:var(--muted);max-width:620px;margin:0 auto 28px}
+  .cta{display:inline-block;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-weight:600;padding:14px 28px;border-radius:10px;font-size:16px}.cta:hover{text-decoration:none;opacity:.92}
+  section{padding:36px 0;border-top:1px solid var(--border)}
+  h2{font-size:28px;font-weight:700;margin-bottom:14px;letter-spacing:-.01em}
+  h3{font-size:19px;font-weight:600;margin:22px 0 8px}
+  p{color:#d4d4d8;margin-bottom:14px}
+  ul{margin:0 0 14px 22px;color:#d4d4d8}li{margin-bottom:8px}
+  .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;margin-top:18px}
+  .step{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px}
+  .step .n{display:inline-flex;width:30px;height:30px;align-items:center;justify-content:center;border-radius:8px;background:var(--accent);color:#fff;font-weight:700;margin-bottom:10px}
+  details{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:10px}
+  summary{font-weight:600;cursor:pointer}details p{margin:10px 0 0}
+  footer.site{border-top:1px solid var(--border);padding:36px 0;color:var(--muted);font-size:14px}
+  footer.site nav{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:14px}
+  @media(max-width:600px){.hero h1{font-size:30px}.hero p.sub{font-size:17px}}
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is an .xcstrings file?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "An .xcstrings file is a String Catalog, Apple's JSON-based localization format introduced in Xcode 15. A single Localizable.xcstrings file holds every translatable string in your app along with its translations, plural rules and device variations, replacing the older .strings and .stringsdict files."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do I translate an .xcstrings file?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Open the free StoreLocalizer tool, drop in your Localizable.xcstrings file, pick your target languages and an AI provider such as OpenAI or AWS Bedrock Claude, then export the translated catalog. The whole process runs in your browser."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Are placeholders and brand names preserved during translation?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. StoreLocalizer keeps format placeholders like %@ and %lld intact and lets you define protected words so brand names and product terms are never translated or altered."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does it support plurals and variations?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "String Catalogs support plural rules and device variations, and the translator preserves the catalog structure so these stay valid after translation. You can review and edit each translation before exporting."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is my .xcstrings file uploaded to a server?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. The tool processes your file entirely client-side in the browser. Only the individual strings you choose to translate are sent to the AI provider you configure; your catalog itself is never uploaded to StoreLocalizer."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How many languages can I translate into?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "You can translate your String Catalog into 40+ languages in a single batch run, and the tool is free and open-source."
+      }
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://storelocalizer.com/"},
+    {"@type": "ListItem", "position": 2, "name": "xcstrings Translator", "item": "https://storelocalizer.com/xcstrings-translator.html"}
+  ]
+}
+</script>
+</head>
+<body>
+<header class="site"><div class="wrap">
+  <a class="logo" href="/">🌍 StoreLocalizer</a>
+  <nav class="top">
+    <a href="/app-store-localization.html">App Store</a>
+    <a href="/google-play-localization.html">Google Play</a>
+    <a href="/xcstrings-translator.html">xcstrings</a>
+    <a href="/app-store-screenshots.html">Screenshots</a>
+    <a href="/subscription-pricing.html">Pricing</a>
+  </nav>
+</div></header>
+
+<div class="hero"><div class="wrap">
+  <h1>xcstrings Translator for Xcode String Catalogs</h1>
+  <p class="sub">Translate your Localizable.xcstrings file into 40+ languages with AI — placeholders, plurals and brand words stay intact. Free, open-source, runs in your browser.</p>
+  <a class="cta" href="/">Open the free tool →</a>
+</div></div>
+
+<section><div class="wrap">
+  <h2>Translate .xcstrings files without the manual grind</h2>
+  <p>The <strong>xcstrings translator</strong> in StoreLocalizer takes the tedium out of localizing iOS, iPadOS and macOS apps. A <code>.xcstrings</code> file — Apple's String Catalog — is the JSON-based localization format introduced in Xcode 15. A single <code>Localizable.xcstrings</code> catalog holds every translatable string in your app, together with its translations, plural rules and device-size variations, replacing the older <code>.strings</code> and <code>.stringsdict</code> files.</p>
+  <p>Instead of copying strings into a spreadsheet or paying a per-word translation service, you drop your catalog into StoreLocalizer and let it translate the missing values for you. Translation is powered by your choice of AI provider — OpenAI, AWS Bedrock (Claude), Azure OpenAI, GitHub Models and more — so you stay in control of cost and quality.</p>
+  <h3>Built for Xcode String Catalogs</h3>
+  <ul>
+    <li>Keeps format placeholders such as <code>%@</code>, <code>%lld</code> and <code>%1$@</code> exactly where they belong.</li>
+    <li>Respects protected brand words and product terms so your name is never mistranslated.</li>
+    <li>Preserves plural and variation structure so the exported catalog stays valid in Xcode.</li>
+    <li>Translates into 40+ languages in a single run, with a review step before export.</li>
+  </ul>
+  <h3>Private by design</h3>
+  <p>Your <code>.xcstrings</code> file is parsed and processed entirely client-side in the browser. Only the individual strings you choose to translate are sent to the AI provider you configure — the catalog itself never touches a StoreLocalizer server. Because the project is open-source, you can read exactly how it works.</p>
+</div></section>
+
+<section><div class="wrap">
+  <h2>How it works</h2>
+  <div class="steps">
+    <div class="step">
+      <span class="n">1</span>
+      <h3>Drop your .xcstrings file</h3>
+      <p>Drag your <code>Localizable.xcstrings</code> String Catalog into the browser. It's parsed locally — nothing is uploaded.</p>
+    </div>
+    <div class="step">
+      <span class="n">2</span>
+      <h3>Pick languages &amp; AI provider</h3>
+      <p>Choose your target languages and an AI provider, set protected words, and start the batched translation queue.</p>
+    </div>
+    <div class="step">
+      <span class="n">3</span>
+      <h3>Export the translated catalog</h3>
+      <p>Review the results, then export a complete <code>.xcstrings</code> file ready to drop straight back into Xcode.</p>
+    </div>
+  </div>
+</div></section>
+
+<section><div class="wrap">
+  <h2>Part of a full localization workflow</h2>
+  <p>Translating your String Catalog is just one step in shipping an app worldwide. Once your in-app text is localized, use StoreLocalizer to translate your store listing with the <a href="/app-store-localization.html">App Store localization tool</a>, then create localized marketing visuals with the <a href="/app-store-screenshots.html">App Store screenshot generator</a>. Everything is free and open-source, so you can localize your entire release without per-seat fees.</p>
+</div></section>
+
+<section><div class="wrap">
+  <h2>Frequently asked questions</h2>
+  <details>
+    <summary>What is an .xcstrings file?</summary>
+    <p>An .xcstrings file is a String Catalog, Apple's JSON-based localization format introduced in Xcode 15. A single Localizable.xcstrings file holds every translatable string in your app along with its translations, plural rules and device variations, replacing the older .strings and .stringsdict files.</p>
+  </details>
+  <details>
+    <summary>How do I translate an .xcstrings file?</summary>
+    <p>Open the free StoreLocalizer tool, drop in your Localizable.xcstrings file, pick your target languages and an AI provider such as OpenAI or AWS Bedrock Claude, then export the translated catalog. The whole process runs in your browser.</p>
+  </details>
+  <details>
+    <summary>Are placeholders and brand names preserved during translation?</summary>
+    <p>Yes. StoreLocalizer keeps format placeholders like %@ and %lld intact and lets you define protected words so brand names and product terms are never translated or altered.</p>
+  </details>
+  <details>
+    <summary>Does it support plurals and variations?</summary>
+    <p>String Catalogs support plural rules and device variations, and the translator preserves the catalog structure so these stay valid after translation. You can review and edit each translation before exporting.</p>
+  </details>
+  <details>
+    <summary>Is my .xcstrings file uploaded to a server?</summary>
+    <p>No. The tool processes your file entirely client-side in the browser. Only the individual strings you choose to translate are sent to the AI provider you configure; your catalog itself is never uploaded to StoreLocalizer.</p>
+  </details>
+  <details>
+    <summary>How many languages can I translate into?</summary>
+    <p>You can translate your String Catalog into 40+ languages in a single batch run, and the tool is free and open-source.</p>
+  </details>
+</div></section>
+
+<footer class="site"><div class="wrap">
+  <nav>
+    <a href="/">Home (free tool)</a>
+    <a href="/app-store-localization.html">App Store Localization</a>
+    <a href="/google-play-localization.html">Google Play Localization</a>
+    <a href="/xcstrings-translator.html">xcstrings Translator</a>
+    <a href="/app-store-screenshots.html">Screenshot Generator</a>
+    <a href="/subscription-pricing.html">Subscription Pricing</a>
+    <a href="https://github.com/fayharinn/StoreLocalizer" rel="noopener">GitHub</a>
+  </nav>
+  <p>StoreLocalizer — free, open-source App Store &amp; Google Play localization. Translate listings into 40+ languages with AI.</p>
+</div></footer>
+</body>
+</html>

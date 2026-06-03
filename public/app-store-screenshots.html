@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>App Store Screenshot Generator — Free, Device Frames</title>
+  <meta name="description" content="Free app store screenshot generator. Build device-frame App Store & Google Play screenshots in your browser, add localized captions, and export every required store size." />
+  <link rel="canonical" href="https://storelocalizer.com/app-store-screenshots.html" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="App Store Screenshot Generator — Free, Device Frames" />
+  <meta property="og:description" content="Build device-frame App Store & Google Play screenshots in your browser, add localized captions, and export every required store size. Free & open-source." />
+  <meta property="og:url" content="https://storelocalizer.com/app-store-screenshots.html" />
+  <meta property="og:image" content="https://storelocalizer.com/og.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="App Store Screenshot Generator — Free, Device Frames" />
+  <meta name="twitter:description" content="Build device-frame App Store & Google Play screenshots in your browser, add localized captions, and export every required store size." />
+  <meta name="twitter:image" content="https://storelocalizer.com/og.png" />
+  <style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg:#0a0a0a;--card:#141414;--text:#e5e5e5;--muted:#a1a1aa;--accent:#7c3aed;--accent2:#8b5cf6;--border:#262626}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.6}
+  a{color:var(--accent2);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:880px;margin:0 auto;padding:0 20px}
+  header.site{position:sticky;top:0;z-index:10;background:rgba(10,10,10,.8);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+  header.site .wrap{display:flex;align-items:center;gap:20px;height:60px}
+  .logo{font-weight:700;font-size:18px;color:var(--text)}
+  nav.top{display:flex;gap:18px;flex-wrap:wrap;margin-left:auto;font-size:14px}nav.top a{color:var(--muted)}
+  .hero{padding:72px 0 48px;text-align:center}
+  .hero h1{font-size:40px;line-height:1.15;font-weight:800;letter-spacing:-.02em;margin-bottom:18px;background:linear-gradient(135deg,#fff,#a78bfa);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero p.sub{font-size:19px;color:var(--muted);max-width:620px;margin:0 auto 28px}
+  .cta{display:inline-block;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-weight:600;padding:14px 28px;border-radius:10px;font-size:16px}.cta:hover{text-decoration:none;opacity:.92}
+  section{padding:36px 0;border-top:1px solid var(--border)}
+  h2{font-size:28px;font-weight:700;margin-bottom:14px;letter-spacing:-.01em}
+  h3{font-size:19px;font-weight:600;margin:22px 0 8px}
+  p{color:#d4d4d8;margin-bottom:14px}
+  ul{margin:0 0 14px 22px;color:#d4d4d8}li{margin-bottom:8px}
+  .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;margin-top:18px}
+  .step{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px}
+  .step .n{display:inline-flex;width:30px;height:30px;align-items:center;justify-content:center;border-radius:8px;background:var(--accent);color:#fff;font-weight:700;margin-bottom:10px}
+  details{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:10px}
+  summary{font-weight:600;cursor:pointer}details p{margin:10px 0 0}
+  footer.site{border-top:1px solid var(--border);padding:36px 0;color:var(--muted);font-size:14px}
+  footer.site nav{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:14px}
+  @media(max-width:600px){.hero h1{font-size:30px}.hero p.sub{font-size:17px}}
+</style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Is the app store screenshot generator free?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. StoreLocalizer's screenshot generator is free and open-source. It runs entirely in your browser, so there is no account, subscription, or upload to a server required to create and export your screenshots."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does it add a watermark to my screenshots?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No. Exported screenshots contain only your own artwork, device frames, and captions. There is no watermark, logo, or branding added to the images."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Which device frames are available?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "You can wrap your raw screenshots in iPhone and iPad device frames for the App Store, plus Android phone frames for Google Play. The 3D device rendering is done client-side with Three.js so frames look sharp at full export resolution."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can the captions be translated into other languages?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. The screenshot generator pairs with StoreLocalizer's App Store and Google Play localization tools, so the headlines and captions you add can be translated into 40+ languages with AI and reused across every localized screenshot set."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Which export sizes does it produce?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "It exports the image dimensions required by App Store Connect and the Google Play Console, including the standard iPhone, iPad, and Android phone screenshot sizes, so you can upload the files directly without resizing."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Do my screenshots get uploaded to a server?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No. Everything happens locally in your browser. Your raw screenshots, captions, and exported files never leave your device, which keeps unreleased designs private."
+        }
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+<header class="site"><div class="wrap">
+  <a class="logo" href="/">🌍 StoreLocalizer</a>
+  <nav class="top">
+    <a href="/app-store-localization.html">App Store</a>
+    <a href="/google-play-localization.html">Google Play</a>
+    <a href="/xcstrings-translator.html">xcstrings</a>
+    <a href="/app-store-screenshots.html">Screenshots</a>
+    <a href="/subscription-pricing.html">Pricing</a>
+  </nav>
+</div></header>
+
+<div class="hero"><div class="wrap">
+  <h1>App Store Screenshot Generator</h1>
+  <p class="sub">Create polished App Store and Google Play screenshots with device frames and localized captions — right in your browser, for free.</p>
+  <a class="cta" href="/">Open the free tool →</a>
+</div></div>
+
+<section><div class="wrap">
+  <h2>Professional device-frame screenshots in the browser</h2>
+  <p>This app store screenshot generator turns your raw app captures into store-ready marketing images. Drop in a screenshot, wrap it in a realistic device frame, and add a bold headline above it. There is nothing to install — the device frames are rendered client-side with Three.js, so everything runs locally and your unreleased designs never leave your machine.</p>
+  <p>It produces both <strong>App Store screenshots</strong> and <strong>Play Store screenshots</strong>, and exports each in the exact dimensions App Store Connect and the Google Play Console expect. That means iPhone, iPad, and Android phone sizes are ready to upload without any manual resizing.</p>
+  <p>Because captions and headlines are just text, they pair naturally with our localization tools. Generate a screenshot set once, then translate the captions into 40+ languages so every market sees device-frame screenshots in its own language. If you are localizing your listing too, start with the <a href="/app-store-localization.html">App Store localization</a> tool or the <a href="/google-play-localization.html">Google Play localization</a> tool and bring the translated text straight into your screenshots.</p>
+  <h3>What you get</h3>
+  <ul>
+    <li>iPhone, iPad, and Android phone device frames / mockups</li>
+    <li>Localized captions and headlines as text overlays</li>
+    <li>Every required App Store Connect and Google Play export size</li>
+    <li>100% client-side — no upload, no account, no watermark</li>
+    <li>Free and open-source</li>
+  </ul>
+</div></section>
+
+<section><div class="wrap">
+  <h2>How it works</h2>
+  <div class="steps">
+    <div class="step">
+      <div class="n">1</div>
+      <h3>Upload your raw screenshots</h3>
+      <p>Drag in the plain screenshots you captured from the simulator or device. No editing required first.</p>
+    </div>
+    <div class="step">
+      <div class="n">2</div>
+      <h3>Pick device frames &amp; add localized captions</h3>
+      <p>Choose an iPhone, iPad, or Android frame, then write a headline. Translate captions into 40+ languages.</p>
+    </div>
+    <div class="step">
+      <div class="n">3</div>
+      <h3>Export every store size</h3>
+      <p>Download images in the dimensions App Store Connect and the Google Play Console require, ready to upload.</p>
+    </div>
+  </div>
+</div></section>
+
+<section><div class="wrap">
+  <h2>Frequently asked questions</h2>
+  <details>
+    <summary>Is the app store screenshot generator free?</summary>
+    <p>Yes. StoreLocalizer's screenshot generator is free and open-source. It runs entirely in your browser, so there is no account, subscription, or upload to a server required to create and export your screenshots.</p>
+  </details>
+  <details>
+    <summary>Does it add a watermark to my screenshots?</summary>
+    <p>No. Exported screenshots contain only your own artwork, device frames, and captions. There is no watermark, logo, or branding added to the images.</p>
+  </details>
+  <details>
+    <summary>Which device frames are available?</summary>
+    <p>You can wrap your raw screenshots in iPhone and iPad device frames for the App Store, plus Android phone frames for Google Play. The 3D device rendering is done client-side with Three.js so frames look sharp at full export resolution.</p>
+  </details>
+  <details>
+    <summary>Can the captions be translated into other languages?</summary>
+    <p>Yes. The screenshot generator pairs with StoreLocalizer's App Store and Google Play localization tools, so the headlines and captions you add can be translated into 40+ languages with AI and reused across every localized screenshot set.</p>
+  </details>
+  <details>
+    <summary>Which export sizes does it produce?</summary>
+    <p>It exports the image dimensions required by App Store Connect and the Google Play Console, including the standard iPhone, iPad, and Android phone screenshot sizes, so you can upload the files directly without resizing.</p>
+  </details>
+  <details>
+    <summary>Do my screenshots get uploaded to a server?</summary>
+    <p>No. Everything happens locally in your browser. Your raw screenshots, captions, and exported files never leave your device, which keeps unreleased designs private.</p>
+  </details>
+</div></section>
+
+<footer class="site"><div class="wrap">
+  <nav>
+    <a href="/">Home (free tool)</a>
+    <a href="/app-store-localization.html">App Store Localization</a>
+    <a href="/google-play-localization.html">Google Play Localization</a>
+    <a href="/xcstrings-translator.html">xcstrings Translator</a>
+    <a href="/app-store-screenshots.html">Screenshot Generator</a>
+    <a href="/subscription-pricing.html">Subscription Pricing</a>
+    <a href="https://github.com/fayharinn/StoreLocalizer" rel="noopener">GitHub</a>
+  </nav>
+  <p>StoreLocalizer — free, open-source App Store &amp; Google Play localization. Translate listings into 40+ languages with AI.</p>
+</div></footer>
+</body>
+</html>

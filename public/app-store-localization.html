@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>App Store Localization Tool — Free AI Translation</title>
+  <meta name="description" content="Free AI tool to localize your App Store listing — translate app name, subtitle, description, keywords & what's new into 40+ languages via App Store Connect." />
+  <link rel="canonical" href="https://storelocalizer.com/app-store-localization.html" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="App Store Localization Tool — Free AI Translation" />
+  <meta property="og:description" content="Translate your App Store Connect listing into 40+ languages with AI — app name, subtitle, description, keywords and what's new. Free and open-source." />
+  <meta property="og:url" content="https://storelocalizer.com/app-store-localization.html" />
+  <meta property="og:image" content="https://storelocalizer.com/og.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="App Store Localization Tool — Free AI Translation" />
+  <meta name="twitter:description" content="Translate your App Store Connect listing into 40+ languages with AI — app name, subtitle, description, keywords and what's new. Free and open-source." />
+  <meta name="twitter:image" content="https://storelocalizer.com/og.png" />
+  <style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg:#0a0a0a;--card:#141414;--text:#e5e5e5;--muted:#a1a1aa;--accent:#7c3aed;--accent2:#8b5cf6;--border:#262626}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.6}
+  a{color:var(--accent2);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:880px;margin:0 auto;padding:0 20px}
+  header.site{position:sticky;top:0;z-index:10;background:rgba(10,10,10,.8);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+  header.site .wrap{display:flex;align-items:center;gap:20px;height:60px}
+  .logo{font-weight:700;font-size:18px;color:var(--text)}
+  nav.top{display:flex;gap:18px;flex-wrap:wrap;margin-left:auto;font-size:14px}nav.top a{color:var(--muted)}
+  .hero{padding:72px 0 48px;text-align:center}
+  .hero h1{font-size:40px;line-height:1.15;font-weight:800;letter-spacing:-.02em;margin-bottom:18px;background:linear-gradient(135deg,#fff,#a78bfa);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero p.sub{font-size:19px;color:var(--muted);max-width:620px;margin:0 auto 28px}
+  .cta{display:inline-block;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-weight:600;padding:14px 28px;border-radius:10px;font-size:16px}.cta:hover{text-decoration:none;opacity:.92}
+  section{padding:36px 0;border-top:1px solid var(--border)}
+  h2{font-size:28px;font-weight:700;margin-bottom:14px;letter-spacing:-.01em}
+  h3{font-size:19px;font-weight:600;margin:22px 0 8px}
+  p{color:#d4d4d8;margin-bottom:14px}
+  ul{margin:0 0 14px 22px;color:#d4d4d8}li{margin-bottom:8px}
+  .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;margin-top:18px}
+  .step{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px}
+  .step .n{display:inline-flex;width:30px;height:30px;align-items:center;justify-content:center;border-radius:8px;background:var(--accent);color:#fff;font-weight:700;margin-bottom:10px}
+  details{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:10px}
+  summary{font-weight:600;cursor:pointer}details p{margin:10px 0 0}
+  footer.site{border-top:1px solid var(--border);padding:36px 0;color:var(--muted);font-size:14px}
+  footer.site nav{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:14px}
+  @media(max-width:600px){.hero h1{font-size:30px}.hero p.sub{font-size:17px}}
+</style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Is the App Store localization tool really free?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. StoreLocalizer is free and open-source. You only pay for your own AI provider usage (for example your OpenAI or Azure key); the tool itself adds no fees and has no paywall."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Do you store my App Store Connect API keys?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No. Your App Store Connect API key and .p8 private key are processed entirely in your browser. The .p8 key is encrypted locally with AES-GCM and never sent to our servers. Requests are signed client-side and routed through a thin CORS proxy that does not log credentials."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Which locales does it support?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "It supports the full set of App Store Connect locales — more than 40 languages and regional variants, including French, German, Spanish, Japanese, Korean, Simplified and Traditional Chinese, Portuguese, Italian and many more."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can it translate keywords for ASO?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. It localizes your keyword field per locale so each market gets relevant search terms. Because the App Store indexes keywords separately per language, localizing them lets you capture additional keyword slots and improve App Store Optimization (ASO) reach."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Which metadata fields can it translate?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "App name, subtitle, promotional text, full description, keywords and the what's new release notes — each field is translated per target locale and can be reviewed before you push it back to App Store Connect."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I keep my brand name from being translated?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Add brand names, product names or other terms to the protected words list. Protected words are kept verbatim across every locale so your branding stays consistent."
+        }
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+<header class="site"><div class="wrap">
+  <a class="logo" href="/">🌍 StoreLocalizer</a>
+  <nav class="top">
+    <a href="/app-store-localization.html">App Store</a>
+    <a href="/google-play-localization.html">Google Play</a>
+    <a href="/xcstrings-translator.html">xcstrings</a>
+    <a href="/app-store-screenshots.html">Screenshots</a>
+    <a href="/subscription-pricing.html">Pricing</a>
+  </nav>
+</div></header>
+
+<main>
+  <div class="hero"><div class="wrap">
+    <h1>App Store Localization Tool</h1>
+    <p class="sub">Translate your App Store listing into 40+ languages with AI — app name, subtitle, description, keywords and what's new — straight from App Store Connect.</p>
+    <a class="cta" href="/">Open the free tool →</a>
+  </div></div>
+
+  <section><div class="wrap">
+    <h2>Localize your App Store listing in one click</h2>
+    <p>StoreLocalizer is a free, open-source App Store localization tool that translates your App Store Connect metadata with AI. Connect your account, pick your target markets, and it localizes every listing field at once — no copy-pasting between a spreadsheet and App Store Connect.</p>
+    <p>It translates the fields that matter for conversion and discovery:</p>
+    <ul>
+      <li><strong>App name</strong> and <strong>subtitle</strong> — your first impression in each storefront</li>
+      <li><strong>Promotional text</strong> and full <strong>description</strong></li>
+      <li><strong>Keywords</strong> — localized per language for App Store Optimization</li>
+      <li><strong>What's new</strong> release notes for every version</li>
+    </ul>
+    <p>Brand names stay intact. Add product or company names to the <strong>protected words</strong> list and they are kept verbatim across every locale, so "translate app store listing" never turns your brand into something unrecognizable.</p>
+
+    <h3>Connects directly to App Store Connect — securely</h3>
+    <p>You bring your own App Store Connect API key and <code>.p8</code> private key. Everything is processed client-side in your browser: the private key is encrypted locally with AES-GCM and the JWT used for App Store Connect localization is signed in-page. We never store or transmit your credentials to a server.</p>
+
+    <h3>Bring your own AI provider</h3>
+    <p>Use OpenAI, Azure OpenAI, AWS Bedrock, GitHub Models and more. You supply the API key, so you control cost and model choice. The tool batches requests concurrently to localize app metadata with AI quickly, even across dozens of locales.</p>
+
+    <h3>Why localized keywords matter for ASO</h3>
+    <p>The App Store indexes your keyword field separately for each language. By translating keywords per locale — and using cross-localization to fill unused language slots in a single storefront — you can claim far more keyword coverage than an English-only listing. Localized metadata is one of the highest-leverage App Store Optimization moves available, and it is free here.</p>
+    <p>Shipping on Google Play too? Use the <a href="/google-play-localization.html">Google Play localization tool</a> for the same workflow on the Play Console. Want polished store visuals? The <a href="/app-store-screenshots.html">App Store screenshot generator</a> produces device-framed, localized screenshots, and the <a href="/xcstrings-translator.html">xcstrings translator</a> handles in-app strings.</p>
+  </div></section>
+
+  <section><div class="wrap">
+    <h2>How it works</h2>
+    <div class="steps">
+      <div class="step">
+        <span class="n">1</span>
+        <h3>Connect App Store Connect</h3>
+        <p>Paste your App Store Connect API key, issuer ID and <code>.p8</code> file. It is encrypted and used only in your browser to fetch your apps and versions.</p>
+      </div>
+      <div class="step">
+        <span class="n">2</span>
+        <h3>Pick locales &amp; AI provider</h3>
+        <p>Choose your target languages from 40+ App Store locales, select your AI provider, and set protected words for brand names.</p>
+      </div>
+      <div class="step">
+        <span class="n">3</span>
+        <h3>Review &amp; push translations</h3>
+        <p>The AI translates every metadata field. Review each locale, edit anything, then push the localizations back to App Store Connect.</p>
+      </div>
+    </div>
+  </div></section>
+
+  <section><div class="wrap">
+    <h2>Frequently asked questions</h2>
+    <details>
+      <summary>Is the App Store localization tool really free?</summary>
+      <p>Yes. StoreLocalizer is free and open-source. You only pay for your own AI provider usage (for example your OpenAI or Azure key); the tool itself adds no fees and has no paywall.</p>
+    </details>
+    <details>
+      <summary>Do you store my App Store Connect API keys?</summary>
+      <p>No. Your App Store Connect API key and <code>.p8</code> private key are processed entirely in your browser. The <code>.p8</code> key is encrypted locally with AES-GCM and never sent to our servers. Requests are signed client-side and routed through a thin CORS proxy that does not log credentials.</p>
+    </details>
+    <details>
+      <summary>Which locales does it support?</summary>
+      <p>It supports the full set of App Store Connect locales — more than 40 languages and regional variants, including French, German, Spanish, Japanese, Korean, Simplified and Traditional Chinese, Portuguese, Italian and many more.</p>
+    </details>
+    <details>
+      <summary>Can it translate keywords for ASO?</summary>
+      <p>Yes. It localizes your keyword field per locale so each market gets relevant search terms. Because the App Store indexes keywords separately per language, localizing them lets you capture additional keyword slots and improve App Store Optimization (ASO) reach.</p>
+    </details>
+    <details>
+      <summary>Which metadata fields can it translate?</summary>
+      <p>App name, subtitle, promotional text, full description, keywords and the what's new release notes — each field is translated per target locale and can be reviewed before you push it back to App Store Connect.</p>
+    </details>
+    <details>
+      <summary>How do I keep my brand name from being translated?</summary>
+      <p>Add brand names, product names or other terms to the protected words list. Protected words are kept verbatim across every locale so your branding stays consistent.</p>
+    </details>
+  </div></section>
+</main>
+
+<footer class="site"><div class="wrap">
+  <nav>
+    <a href="/">Home (free tool)</a>
+    <a href="/app-store-localization.html">App Store Localization</a>
+    <a href="/google-play-localization.html">Google Play Localization</a>
+    <a href="/xcstrings-translator.html">xcstrings Translator</a>
+    <a href="/app-store-screenshots.html">Screenshot Generator</a>
+    <a href="/subscription-pricing.html">Subscription Pricing</a>
+    <a href="https://github.com/fayharinn/StoreLocalizer" rel="noopener">GitHub</a>
+  </nav>
+  <p>StoreLocalizer — free, open-source App Store &amp; Google Play localization. Translate listings into 40+ languages with AI.</p>
+</div></footer>
+</body>
+</html>

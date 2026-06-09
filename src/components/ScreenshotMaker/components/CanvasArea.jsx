@@ -313,6 +313,7 @@ export default function CanvasArea({ state, dispatch, threeRenderer, getScreensh
     dims,
     previewScale,
     updateSidePreviews,
+    getScreenshotImage,
   ]);
 
   // -----------------------------------------------------------------------

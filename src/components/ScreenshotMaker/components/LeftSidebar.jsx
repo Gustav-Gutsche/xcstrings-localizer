@@ -36,10 +36,6 @@ import {
   getAvailableLanguagesForScreenshot,
   isScreenshotComplete,
 } from '../utils/languageUtils';
-import {
-  saveProjectsMeta,
-  deleteProjectState,
-} from '../utils/persistence';
 
 // =============================================================================
 // Device options for the output size dropdown
@@ -301,13 +297,12 @@ export default function LeftSidebar({
     reader.onload = (ev) => {
       const img = new Image();
       img.onload = () => {
-        const detectedLang = detectLanguageFromFilename(file.name);
-        // Dispatch a localized image set for the replacement
+        // Dispatch a localized image set for the replacement under the current active language
         dispatch({
           type: 'SET_LOCALIZED_IMAGE',
           payload: {
             screenshotIndex: targetIdx,
-            lang: detectedLang,
+            lang: currentLanguage,
             image: img,
             src: ev.target.result,
             name: file.name,
@@ -318,7 +313,7 @@ export default function LeftSidebar({
     };
     reader.readAsDataURL(file);
     e.target.value = '';
-  }, [dispatch]);
+  }, [dispatch, currentLanguage]);
 
   // ---------------------------------------------------------------------------
   // Drag and drop reordering
@@ -506,8 +501,9 @@ export default function LeftSidebar({
     const isDragOver = index === dragOverIndex && dragIndex !== index;
     const isTransferTarget = transferTarget === index;
 
-    // Get the first available image for thumbnail
-    const thumbSrc = screenshot.image?.src
+    // Get image for thumbnail: prefer current language, fall back to first available
+    const thumbSrc = (screenshot.localizedImages?.[currentLanguage]?.image?.src)
+      || screenshot.image?.src
       || (screenshot.localizedImages && Object.values(screenshot.localizedImages).find(l => l?.image)?.image?.src)
       || null;
 
@@ -612,12 +608,9 @@ export default function LeftSidebar({
   // ---------------------------------------------------------------------------
   // Render
   // ---------------------------------------------------------------------------
-  const Wrapper = mobile ? React.Fragment : ({ children }) => <div className="sidebar">{children}</div>;
-  const ContentWrapper = mobile ? React.Fragment : ({ children }) => <div className="sidebar-content">{children}</div>;
-
   return (
-    <Wrapper>
-      <ContentWrapper>
+    <div className={mobile ? '' : 'sidebar'}>
+      <div className={mobile ? '' : 'sidebar-content'}>
         {/* ---- Header with undo/redo, language picker and AI indicator ---- */}
         <div className="sidebar-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
@@ -864,7 +857,7 @@ export default function LeftSidebar({
             Translate All Languages
           </button>
         </div>
-      </ContentWrapper>
+      </div>
 
       {/* ---- Sidebar footer with export controls ---- */}
       <div className={mobile ? '' : 'sidebar-footer'}>
@@ -1008,6 +1001,6 @@ export default function LeftSidebar({
         </div>
       )}
 
-    </Wrapper>
+    </div>
   );
 }

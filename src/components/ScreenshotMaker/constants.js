@@ -126,11 +126,11 @@ export const llmProviders = {
         storageKey: 'claudeApiKey',
         modelStorageKey: 'anthropicModel',
         models: [
-            { id: 'claude-haiku-4-5-20251001', name: 'Claude Haiku 4.5 ($)' },
-            { id: 'claude-sonnet-4-5-20250929', name: 'Claude Sonnet 4.5 ($$)' },
-            { id: 'claude-opus-4-5-20251101', name: 'Claude Opus 4.5 ($$$)' },
+            { id: 'claude-haiku-4-5', name: 'Claude Haiku 4.5 ($)' },
+            { id: 'claude-sonnet-4-6', name: 'Claude Sonnet 4.6 ($$)' },
+            { id: 'claude-opus-4-8', name: 'Claude Opus 4.8 ($$$)' },
         ],
-        defaultModel: 'claude-sonnet-4-6'
+        defaultModel: 'claude-haiku-4-5'
     },
     openai: {
         name: 'OpenAI (GPT)',
@@ -163,11 +163,11 @@ export const llmProviders = {
         storageKey: 'googleApiKey',
         modelStorageKey: 'googleModel',
         models: [
-            { id: 'gemini-2.5-flash-lite', name: 'Gemini 2.5 Flash-Lite ($)' },
-            { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash ($$)' },
-            { id: 'gemini-2.5-pro', name: 'Gemini 2.5 Pro ($$$)' }
+            { id: 'gemini-3.1-flash-lite', name: 'Gemini 3.1 Flash-Lite ($)' },
+            { id: 'gemini-3.5-flash', name: 'Gemini 3.5 Flash ($$)' },
+            { id: 'gemini-3.1-pro-preview', name: 'Gemini 3.1 Pro ($$$)' }
         ],
-        defaultModel: 'gemini-2.5-flash'
+        defaultModel: 'gemini-3.5-flash'
     },
     github: {
         name: 'GitHub Models',

@@ -68,6 +68,16 @@ export const PROVIDERS = {
     models: ['gpt-4o', 'gpt-4.1'],
     defaultModel: 'gpt-4o',
   },
+  anthropic: {
+    name: 'Anthropic (Claude)',
+    models: ['claude-haiku-4-5', 'claude-sonnet-4-6', 'claude-opus-4-8'],
+    defaultModel: 'claude-haiku-4-5',
+  },
+  google: {
+    name: 'Google (Gemini)',
+    models: ['gemini-3.1-flash-lite', 'gemini-3.5-flash', 'gemini-3.1-pro-preview'],
+    defaultModel: 'gemini-3.5-flash',
+  },
   deepseek: {
     name: 'DeepSeek',
     models: ['deepseek-v4-flash', 'deepseek-v4-pro'],
@@ -383,6 +393,37 @@ async function callAnthropic(apiKey, model, systemMessage, userMessage) {
   return result.content[0].text
 }
 
+// Google Gemini API (generateContent). API key goes in a header, never in the URL.
+async function callGemini(apiKey, model, systemMessage, userMessage, jsonMode = true) {
+  const body = {
+    contents: [{ parts: [{ text: userMessage }] }],
+    systemInstruction: { parts: [{ text: systemMessage }] },
+  }
+  if (jsonMode) {
+    body.generationConfig = { responseMimeType: 'application/json' }
+  }
+
+  const response = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,
+    {
+      method: 'POST',
+      headers: {
+        'x-goog-api-key': apiKey,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    }
+  )
+
+  const result = await response.json()
+  if (result.error) throw new Error(result.error.message || JSON.stringify(result.error))
+  const text = result.candidates?.[0]?.content?.parts?.map(p => p.text).join('')
+  if (!text) {
+    throw new Error(`Invalid Gemini response: ${JSON.stringify(result).slice(0, 200)}`)
+  }
+  return text
+}
+
 // Azure OpenAI API
 async function callAzure(apiKey, model, endpoint, systemMessage, userMessage, jsonMode = true) {
   // Extract base URL (just the host part, strip any path)
@@ -513,6 +554,12 @@ async function translateSingleText(text, targetLangs, config, protectedWords = [
       case 'cloudflare':
         content = await callCloudflare(apiKey, model, endpoint, systemMessage, userMessage)
         break
+      case 'anthropic':
+        content = await callAnthropic(apiKey, model, systemMessage, userMessage)
+        break
+      case 'google':
+        content = await callGemini(apiKey, model, systemMessage, userMessage)
+        break
       default:
         throw new Error(`Unknown provider: ${provider}`)
     }
@@ -562,6 +609,12 @@ async function translateBatch(texts, targetLangs, config, protectedWords = []) {
         break
       case 'cloudflare':
         content = await callCloudflare(apiKey, model, endpoint, systemMessage, userMessage)
+        break
+      case 'anthropic':
+        content = await callAnthropic(apiKey, model, systemMessage, userMessage)
+        break
+      case 'google':
+        content = await callGemini(apiKey, model, systemMessage, userMessage)
         break
       default:
         throw new Error(`Unknown provider: ${provider}`)
@@ -717,6 +770,20 @@ export async function testApiConnection(config) {
         })
         break
 
+      case 'google':
+        response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
+          method: 'POST',
+          headers: {
+            'x-goog-api-key': apiKey,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: testMessage }] }],
+            generationConfig: { maxOutputTokens: 20 }
+          })
+        })
+        break
+
       case 'cloudflare':
         response = await fetch(cloudflareUrl(endpoint), {
           method: 'POST',
@@ -802,6 +869,12 @@ export async function translateText(prompt, sourceLocale, targetLocale, config) 
         break
       case 'cloudflare':
         content = await callCloudflare(apiKey, model, endpoint, systemMessage, prompt, false)
+        break
+      case 'anthropic':
+        content = await callAnthropic(apiKey, model, systemMessage, prompt)
+        break
+      case 'google':
+        content = await callGemini(apiKey, model, systemMessage, prompt, false)
         break
       default:
         throw new Error(`Unknown provider: ${provider}`)

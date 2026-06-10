@@ -49,11 +49,20 @@ import { PROVIDERS, fetchOpenAIModels } from '@/services/translationService'
 // Brand accent shown as a dot next to each AI provider in the selector
 const PROVIDER_COLORS = {
   openai: '#10a37f',
+  anthropic: '#d97757',
+  google: '#4285f4',
   azure: '#0078d4',
   bedrock: '#ff9900',
   github: '#8b5cf6',
   deepseek: '#4d6bfe',
   cloudflare: '#f38020',
+}
+
+const PROVIDER_KEY_PLACEHOLDERS = {
+  openai: 'sk-...',
+  anthropic: 'sk-ant-...',
+  google: 'AIza...',
+  deepseek: 'sk-...',
 }
 
 const NAV_ITEMS = [
@@ -600,7 +609,7 @@ export function AppSidebar({
                   <Label className="text-xs font-medium text-muted-foreground">API Key</Label>
                   <Input
                     type="password"
-                    placeholder={providerConfig.provider === 'openai' ? 'sk-...' : 'Enter your API key...'}
+                    placeholder={PROVIDER_KEY_PLACEHOLDERS[providerConfig.provider] || 'Enter your API key...'}
                     value={currentApiKey}
                     onChange={(e) => handleApiKeyChange(e.target.value)}
                     className="h-9 text-sm bg-muted/30 border-border/50 focus:border-primary/50"

@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { toast } from 'sonner'
-import { FileText, Globe, ChevronDown, Key, Cpu, Trash2, ExternalLink, Lock, Unlock, Save, Languages, Store, Sparkles, CheckCircle2, AlertCircle, Link2, AppWindow, Layers, TrendingUp, Terminal, Image, Moon, Sun, Monitor, DollarSign, Play, Loader2 } from 'lucide-react'
+import { FileText, Globe, ChevronDown, Key, Cpu, Trash2, ExternalLink, Lock, Unlock, Save, Languages, Store, Sparkles, CheckCircle2, AlertCircle, Link2, AppWindow, Layers, TrendingUp, Terminal, Image, Moon, Sun, Monitor, DollarSign, Play, Loader2, Search } from 'lucide-react'
 import { useTheme } from './ThemeProvider'
 import {
   Sidebar,
@@ -18,7 +18,6 @@ import {
 } from '@/components/ui/sidebar'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import {
@@ -45,8 +44,27 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { PROVIDERS } from '@/services/translationService'
+import { PROVIDERS, fetchOpenAIModels } from '@/services/translationService'
+
+// Brand accent shown as a dot next to each AI provider in the selector
+const PROVIDER_COLORS = {
+  openai: '#10a37f',
+  azure: '#0078d4',
+  bedrock: '#ff9900',
+  github: '#8b5cf6',
+  deepseek: '#4d6bfe',
+  cloudflare: '#f38020',
+}
+
+const NAV_ITEMS = [
+  { id: 'xcstrings', label: 'XCStrings', icon: Languages, tooltip: 'XCStrings Translator' },
+  { id: 'appstore', label: 'App Store Connect', icon: Store, tooltip: 'App Store Connect' },
+  { id: 'googleplay', label: 'Google Play', icon: Play, tooltip: 'Google Play Console' },
+  { id: 'screenshots', label: 'Screenshots', icon: Image, tooltip: 'Screenshot Maker' },
+  { id: 'subscriptions', label: 'Subscriptions', icon: DollarSign, tooltip: 'Subscription Pricing & Translations' },
+]
 import { encrypt, decrypt } from '@/utils/crypto'
+import { isLocalEnvironment } from '@/constants'
 
 const ENCRYPTED_KEY_STORAGE = 'asc-encrypted-p8-key'
 
@@ -60,13 +78,16 @@ export function AppSidebar({
   gpCredentials,
   onGpCredentialsChange,
   astroConfig,
-  onAstroConfigChange
+  onAstroConfigChange,
+  appCompeteConfig,
+  onAppCompeteConfigChange
 }) {
   const { theme, setTheme } = useTheme()
   const [isDraggingKey, setIsDraggingKey] = useState(false)
   const [isDraggingGpKey, setIsDraggingGpKey] = useState(false)
   const [aiSettingsOpen, setAiSettingsOpen] = useState(true)
   const [astroSettingsOpen, setAstroSettingsOpen] = useState(false)
+  const [appCompeteOpen, setAppCompeteOpen] = useState(false)
   const [astroTesting, setAstroTesting] = useState(false)
   const [astroTestResult, setAstroTestResult] = useState(null)
   const [ascSettingsOpen, setAscSettingsOpen] = useState(true)
@@ -97,6 +118,57 @@ export function AppSidebar({
 
   const currentApiKey = providerConfig.apiKeys[providerConfig.provider] || ''
   const currentModel = providerConfig.models[providerConfig.provider] || PROVIDERS[providerConfig.provider]?.defaultModel || ''
+
+  // Dynamically fetched OpenAI model list (so the user doesn't have to add models by hand)
+  const [openaiModels, setOpenaiModels] = useState([])
+  const [modelsLoading, setModelsLoading] = useState(false)
+  const [modelsError, setModelsError] = useState('')
+
+  const openaiApiKey = providerConfig.apiKeys.openai || ''
+  useEffect(() => {
+    if (providerConfig.provider !== 'openai') return
+    let cancelled = false
+    const hasValidKey = openaiApiKey.length >= 20
+    // All state updates happen inside the timer callback so none run synchronously
+    // during the effect (avoids cascading re-renders).
+    const timer = setTimeout(async () => {
+      if (!hasValidKey) {
+        setOpenaiModels([])
+        setModelsError('')
+        setModelsLoading(false)
+        return
+      }
+      setModelsLoading(true)
+      setModelsError('')
+      try {
+        const models = await fetchOpenAIModels(openaiApiKey)
+        if (!cancelled) setOpenaiModels(models)
+      } catch (err) {
+        if (!cancelled) {
+          setOpenaiModels([])
+          setModelsError(err?.message || 'Failed to load models')
+        }
+      } finally {
+        if (!cancelled) setModelsLoading(false)
+      }
+    }, hasValidKey ? 600 : 0)
+    return () => { cancelled = true; clearTimeout(timer) }
+  }, [providerConfig.provider, openaiApiKey])
+
+  // Options shown in the model dropdown. We keep a small curated list per provider;
+  // for OpenAI we filter it down to the models actually available on the account
+  // (falling back to the full curated list if the live list isn't loaded yet).
+  const modelOptions = useMemo(() => {
+    const curated = PROVIDERS[providerConfig.provider]?.models || []
+    let list = curated
+    if (providerConfig.provider === 'openai' && openaiModels.length > 0) {
+      const available = curated.filter(m => openaiModels.includes(m))
+      list = available.length > 0 ? available : curated
+    }
+    // Make sure the currently selected model is always selectable
+    if (currentModel && !list.includes(currentModel)) list = [currentModel, ...list]
+    return list
+  }, [providerConfig.provider, openaiModels, currentModel])
 
   // Handlers
   const handleProviderChange = (newProvider) => {
@@ -167,6 +239,10 @@ export function AppSidebar({
     if (!model) return 'Select model'
     if (model.includes('inference-profile/')) {
       return model.split('/').pop().replace('global.anthropic.', '').replace(/-v\d+:\d+$/, '')
+    }
+    // Cloudflare ids look like @cf/meta/llama-3.3-70b-instruct-fp8-fast — show the model name only
+    if (model.startsWith('@cf/')) {
+      return model.split('/').pop()
     }
     return model
   }
@@ -321,14 +397,14 @@ export function AppSidebar({
 
   return (
     <Sidebar variant="inset" collapsible="icon">
-      <SidebarHeader className="border-b border-sidebar-border/50 bg-gradient-to-b from-sidebar to-sidebar/80">
-        <div className="flex items-center gap-3 px-3 py-4 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 shadow-lg shadow-violet-500/25">
-            <Globe className="h-5 w-5 text-white" />
+      <SidebarHeader className="border-b border-sidebar-border/50">
+        <div className="flex items-center gap-2.5 px-3 py-3 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-violet-500 to-indigo-600 shadow-sm shadow-violet-500/30">
+            <Globe className="h-4 w-4 text-white" />
           </div>
-          <div className="flex flex-col group-data-[collapsible=icon]:hidden">
-            <span className="text-base font-bold tracking-tight">Localizer</span>
-            <span className="text-xs text-muted-foreground">App Store & Play Store</span>
+          <div className="flex min-w-0 flex-col group-data-[collapsible=icon]:hidden">
+            <span className="text-sm font-semibold tracking-tight leading-tight">Localizer</span>
+            <span className="text-[11px] leading-tight text-muted-foreground truncate">App Store & Play Store</span>
           </div>
         </div>
       </SidebarHeader>
@@ -338,97 +414,33 @@ export function AppSidebar({
         <SidebarGroup className="pt-4">
           <SidebarGroupLabel className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/70 px-2 mb-2">Tools</SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu className="space-y-1">
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  isActive={activePage === 'xcstrings'}
-                  onClick={() => onPageChange('xcstrings')}
-                  tooltip="XCStrings Translator"
-                  className={`rounded-xl h-11 px-3 transition-all duration-200 ${
-                    activePage === 'xcstrings'
-                      ? 'bg-primary/10 text-primary font-medium shadow-sm'
-                      : 'hover:bg-muted/50'
-                  }`}
-                >
-                  <Languages className={`h-5 w-5 ${activePage === 'xcstrings' ? 'text-primary' : ''}`} />
-                  <span>XCStrings</span>
-                  {activePage === 'xcstrings' && (
-                    <div className="ml-auto h-2 w-2 rounded-full bg-primary animate-pulse" />
-                  )}
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  isActive={activePage === 'appstore'}
-                  onClick={() => onPageChange('appstore')}
-                  tooltip="App Store Connect"
-                  className={`rounded-xl h-11 px-3 transition-all duration-200 ${
-                    activePage === 'appstore'
-                      ? 'bg-primary/10 text-primary font-medium shadow-sm'
-                      : 'hover:bg-muted/50'
-                  }`}
-                >
-                  <Store className={`h-5 w-5 ${activePage === 'appstore' ? 'text-primary' : ''}`} />
-                  <span>App Store Connect</span>
-                  {activePage === 'appstore' && (
-                    <div className="ml-auto h-2 w-2 rounded-full bg-primary animate-pulse" />
-                  )}
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  isActive={activePage === 'googleplay'}
-                  onClick={() => onPageChange('googleplay')}
-                  tooltip="Google Play Console"
-                  className={`rounded-xl h-11 px-3 transition-all duration-200 ${
-                    activePage === 'googleplay'
-                      ? 'bg-primary/10 text-primary font-medium shadow-sm'
-                      : 'hover:bg-muted/50'
-                  }`}
-                >
-                  <Play className={`h-5 w-5 ${activePage === 'googleplay' ? 'text-primary' : ''}`} />
-                  <span>Google Play</span>
-                  {activePage === 'googleplay' && (
-                    <div className="ml-auto h-2 w-2 rounded-full bg-primary animate-pulse" />
-                  )}
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  isActive={activePage === 'screenshots'}
-                  onClick={() => onPageChange('screenshots')}
-                  tooltip="Screenshot Maker"
-                  className={`rounded-xl h-11 px-3 transition-all duration-200 ${
-                    activePage === 'screenshots'
-                      ? 'bg-primary/10 text-primary font-medium shadow-sm'
-                      : 'hover:bg-muted/50'
-                  }`}
-                >
-                  <Image className={`h-5 w-5 ${activePage === 'screenshots' ? 'text-primary' : ''}`} />
-                  <span>Screenshots</span>
-                  {activePage === 'screenshots' && (
-                    <div className="ml-auto h-2 w-2 rounded-full bg-primary animate-pulse" />
-                  )}
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  isActive={activePage === 'subscriptions'}
-                  onClick={() => onPageChange('subscriptions')}
-                  tooltip="Subscription Pricing & Translations"
-                  className={`rounded-xl h-11 px-3 transition-all duration-200 ${
-                    activePage === 'subscriptions'
-                      ? 'bg-primary/10 text-primary font-medium shadow-sm'
-                      : 'hover:bg-muted/50'
-                  }`}
-                >
-                  <DollarSign className={`h-5 w-5 ${activePage === 'subscriptions' ? 'text-primary' : ''}`} />
-                  <span>Subscriptions</span>
-                  {activePage === 'subscriptions' && (
-                    <div className="ml-auto h-2 w-2 rounded-full bg-primary animate-pulse" />
-                  )}
-                </SidebarMenuButton>
-              </SidebarMenuItem>
+            <SidebarMenu className="space-y-0.5">
+              {NAV_ITEMS.map(({ id, label, icon: Icon, tooltip }) => {
+                const active = activePage === id
+                return (
+                  <SidebarMenuItem key={id}>
+                    <SidebarMenuButton
+                      isActive={active}
+                      onClick={() => onPageChange(id)}
+                      tooltip={tooltip}
+                      className={`relative rounded-lg h-9 px-3 text-[13px] transition-colors duration-150 ${
+                        active
+                          ? 'bg-primary/8 text-primary font-semibold'
+                          : 'text-muted-foreground hover:text-foreground hover:bg-muted/40'
+                      }`}
+                    >
+                      {/* Left accent bar marks the active page */}
+                      <span
+                        className={`absolute left-0 top-1/2 -translate-y-1/2 h-4 w-0.5 rounded-full bg-primary transition-opacity duration-150 ${
+                          active ? 'opacity-100' : 'opacity-0'
+                        }`}
+                      />
+                      <Icon className={`h-4 w-4 ${active ? 'text-primary' : ''}`} />
+                      <span>{label}</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                )
+              })}
             </SidebarMenu>
 
             {/* App Store Connect Quick Nav - only show when on appstore page */}
@@ -535,35 +547,52 @@ export function AppSidebar({
         <Collapsible open={aiSettingsOpen} onOpenChange={setAiSettingsOpen} className="group-data-[collapsible=icon]:hidden">
           <SidebarGroup>
             <SidebarGroupLabel asChild>
-              <CollapsibleTrigger className="flex w-full items-center justify-between px-2 py-2 rounded-xl hover:bg-muted/50 transition-colors [&[data-state=open]>svg]:rotate-180">
-                <div className="flex items-center gap-2.5">
-                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-violet-500/10">
-                    <Sparkles className="h-4 w-4 text-violet-500" />
-                  </div>
-                  <span className="font-medium">AI Provider</span>
+              <CollapsibleTrigger className="flex w-full items-center justify-between px-2 py-2 rounded-lg hover:bg-muted/40 transition-colors [&[data-state=open]>svg.chevron-icon]:rotate-180">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-violet-500" />
+                  <span className="text-[13px] font-medium">AI Provider</span>
+                  <span
+                    className={`h-1.5 w-1.5 rounded-full ${currentApiKey ? 'bg-emerald-500' : 'bg-amber-500'}`}
+                    title={currentApiKey ? 'Ready to translate' : 'API key required'}
+                  />
                 </div>
-                <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform duration-200" />
+                <ChevronDown className="chevron-icon h-4 w-4 text-muted-foreground transition-transform duration-200" />
               </CollapsibleTrigger>
             </SidebarGroupLabel>
             <CollapsibleContent>
-              <SidebarGroupContent className="px-2 pt-3 space-y-4">
-                {/* Provider Pills */}
-                <div className="flex flex-wrap gap-1.5">
-                  {Object.entries(PROVIDERS).map(([key, provider]) => (
-                    <button
-                      key={key}
-                      onClick={() => handleProviderChange(key)}
-                      className={`
-                        px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200
-                        ${providerConfig.provider === key
-                          ? 'bg-primary text-primary-foreground shadow-sm'
-                          : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground'
-                        }
-                      `}
-                    >
-                      {provider.name}
-                    </button>
-                  ))}
+              <SidebarGroupContent className="px-2 pt-3 space-y-3">
+                {/* Provider selector — one clean row with brand dot */}
+                <div className="space-y-2">
+                  <Label className="text-xs font-medium text-muted-foreground">Provider</Label>
+                  <Select value={providerConfig.provider} onValueChange={handleProviderChange}>
+                    <SelectTrigger className="h-9 text-sm bg-muted/30 border-border/50">
+                      <SelectValue>
+                        <span className="flex items-center gap-2">
+                          <span
+                            className="h-2 w-2 shrink-0 rounded-full"
+                            style={{ background: PROVIDER_COLORS[providerConfig.provider] || 'var(--muted-foreground)' }}
+                          />
+                          {PROVIDERS[providerConfig.provider]?.name || providerConfig.provider}
+                        </span>
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.entries(PROVIDERS).map(([key, provider]) => (
+                        <SelectItem key={key} value={key}>
+                          <span className="flex items-center gap-2">
+                            <span
+                              className="h-2 w-2 shrink-0 rounded-full"
+                              style={{ background: PROVIDER_COLORS[key] || 'var(--muted-foreground)' }}
+                            />
+                            {provider.name}
+                            {providerConfig.apiKeys[key] ? (
+                              <CheckCircle2 className="h-3 w-3 text-emerald-500 ml-auto" />
+                            ) : null}
+                          </span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 {/* API Key */}
@@ -591,7 +620,7 @@ export function AppSidebar({
                         list={`model-suggestions-${providerConfig.provider}`}
                       />
                       <datalist id={`model-suggestions-${providerConfig.provider}`}>
-                        {PROVIDERS[providerConfig.provider]?.models.map(model => (
+                        {modelOptions.map(model => (
                           <option key={model} value={model} />
                         ))}
                       </datalist>
@@ -602,11 +631,16 @@ export function AppSidebar({
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        {PROVIDERS[providerConfig.provider]?.models.map(model => (
+                        {modelOptions.map(model => (
                           <SelectItem key={model} value={model}>{getModelDisplayName(model)}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
+                  )}
+                  {providerConfig.provider === 'openai' && (modelsLoading || modelsError) && (
+                    <p className="text-[11px] text-muted-foreground">
+                      {modelsLoading ? 'Loading models from OpenAI…' : `Couldn't load models: ${modelsError}`}
+                    </p>
                   )}
                 </div>
 
@@ -632,10 +666,10 @@ export function AppSidebar({
                   </div>
                 )}
 
-                {/* Endpoint URL for Azure */}
+                {/* Endpoint URL for Azure / Account ID for Cloudflare */}
                 {PROVIDERS[providerConfig.provider]?.needsEndpoint && (
                   <div className="space-y-2">
-                    <Label className="text-xs font-medium text-muted-foreground">Endpoint URL</Label>
+                    <Label className="text-xs font-medium text-muted-foreground">{PROVIDERS[providerConfig.provider]?.endpointLabel || 'Endpoint URL'}</Label>
                     <Input
                       placeholder={PROVIDERS[providerConfig.provider]?.placeholder || 'https://your-resource.openai.azure.com'}
                       value={providerConfig.endpoint || ''}
@@ -658,20 +692,13 @@ export function AppSidebar({
                   </div>
                 )}
 
-                {/* Status */}
-                <div className="pt-1">
-                  {currentApiKey ? (
-                    <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-500/10 text-emerald-500">
-                      <CheckCircle2 className="h-4 w-4" />
-                      <span className="text-xs font-medium">Ready to translate</span>
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-500/10 text-amber-500">
-                      <AlertCircle className="h-4 w-4" />
-                      <span className="text-xs font-medium">API key required</span>
-                    </div>
-                  )}
-                </div>
+                {/* Status — compact inline line, the dot in the section header mirrors it */}
+                {!currentApiKey && (
+                  <p className="flex items-center gap-1.5 text-[11px] text-amber-500">
+                    <AlertCircle className="h-3 w-3" />
+                    API key required to translate
+                  </p>
+                )}
               </SidebarGroupContent>
             </CollapsibleContent>
           </SidebarGroup>
@@ -679,21 +706,20 @@ export function AppSidebar({
 
         <SidebarSeparator className="my-4 opacity-50 group-data-[collapsible=icon]:hidden" />
 
-        {/* Astro ASO Settings */}
+        {/* Astro ASO Settings — local MCP server, useless outside localhost/Tauri */}
+        {isLocalEnvironment() && (
         <Collapsible open={astroSettingsOpen} onOpenChange={setAstroSettingsOpen} className="group-data-[collapsible=icon]:hidden">
           <SidebarGroup>
             <SidebarGroupLabel asChild>
-              <CollapsibleTrigger className="flex w-full items-center justify-between px-2 py-2 rounded-xl hover:bg-muted/50 transition-colors [&[data-state=open]>svg]:rotate-180">
-                <div className="flex items-center gap-2.5">
-                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-orange-500/10">
-                    <TrendingUp className="h-4 w-4 text-orange-500" />
-                  </div>
-                  <span className="text-sm font-semibold">Astro ASO</span>
+              <CollapsibleTrigger className="flex w-full items-center justify-between px-2 py-2 rounded-lg hover:bg-muted/40 transition-colors [&[data-state=open]>svg.chevron-icon]:rotate-180">
+                <div className="flex items-center gap-2">
+                  <TrendingUp className="h-4 w-4 text-orange-500" />
+                  <span className="text-[13px] font-medium">Astro ASO</span>
                   {astroConfig?.enabled && (
-                    <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4 bg-orange-500/10 text-orange-500 border-0">ON</Badge>
+                    <span className="h-1.5 w-1.5 rounded-full bg-orange-500" title="Enabled" />
                   )}
                 </div>
-                <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform duration-200" />
+                <ChevronDown className="chevron-icon h-4 w-4 text-muted-foreground transition-transform duration-200" />
               </CollapsibleTrigger>
             </SidebarGroupLabel>
             <CollapsibleContent>
@@ -752,6 +778,72 @@ export function AppSidebar({
             </CollapsibleContent>
           </SidebarGroup>
         </Collapsible>
+        )}
+
+        {/* AppCompete Keyword Review */}
+        <Collapsible open={appCompeteOpen} onOpenChange={setAppCompeteOpen} className="group-data-[collapsible=icon]:hidden">
+          <SidebarGroup>
+            <SidebarGroupLabel asChild>
+              <CollapsibleTrigger className="flex w-full items-center justify-between px-2 py-2 rounded-lg hover:bg-muted/40 transition-colors [&[data-state=open]>svg.chevron-icon]:rotate-180">
+                <div className="flex items-center gap-2">
+                  <Search className="h-4 w-4 text-sky-500" />
+                  <span className="text-[13px] font-medium">AppCompete Keyword Review</span>
+                  {appCompeteConfig?.apiKey && (
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" title="API key configured" />
+                  )}
+                </div>
+                <ChevronDown className="chevron-icon h-4 w-4 text-muted-foreground transition-transform duration-200" />
+              </CollapsibleTrigger>
+            </SidebarGroupLabel>
+            <CollapsibleContent>
+              <SidebarGroupContent className="px-2 pt-3 space-y-3">
+                {/* Link to get the key */}
+                <a
+                  href="https://appcompete.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg bg-sky-500/10 text-sky-500 text-xs font-medium hover:bg-sky-500/20 transition-colors"
+                >
+                  <ExternalLink className="h-3.5 w-3.5" />
+                  <span>Get API Key from AppCompete</span>
+                </a>
+
+                {/* How-to */}
+                <ol className="space-y-1 pl-4 text-[10px] text-muted-foreground leading-relaxed list-decimal">
+                  <li>Sign in on appcompete.com</li>
+                  <li>Open <span className="text-foreground/80">“Connect AppCompete to your AI client”</span></li>
+                  <li>Click <span className="text-foreground/80">Generate</span> — the key (<code className="text-[9px]">ac_live_…</code>) is shown only once, copy it right away</li>
+                  <li>Paste it below — you can revoke or rotate it anytime from the same page</li>
+                </ol>
+
+                {/* API Key */}
+                <div className="space-y-2">
+                  <Label className="text-xs font-medium text-muted-foreground">API Key</Label>
+                  <Input
+                    type="password"
+                    placeholder="ac_live_…"
+                    value={appCompeteConfig?.apiKey || ''}
+                    onChange={(e) => onAppCompeteConfigChange(prev => ({ ...prev, apiKey: e.target.value.trim() }))}
+                    className="h-9 text-sm bg-muted/30 border-border/50 focus:border-primary/50"
+                    autoComplete="off"
+                    data-1p-ignore
+                  />
+                </div>
+
+                {appCompeteConfig?.apiKey ? (
+                  <p className="flex items-center gap-1.5 text-[11px] text-emerald-500">
+                    <CheckCircle2 className="h-3 w-3" />
+                    Key saved — Rank Tracker & keyword review ready
+                  </p>
+                ) : (
+                  <p className="text-[10px] text-muted-foreground leading-relaxed">
+                    Track keyword rankings, mine competitor keywords and review ASO opportunities with AppCompete.
+                  </p>
+                )}
+              </SidebarGroupContent>
+            </CollapsibleContent>
+          </SidebarGroup>
+        </Collapsible>
 
         <SidebarSeparator className="my-4 opacity-50 group-data-[collapsible=icon]:hidden" />
 
@@ -759,14 +851,12 @@ export function AppSidebar({
         <Collapsible open={ascSettingsOpen} onOpenChange={setAscSettingsOpen} className="group-data-[collapsible=icon]:hidden">
           <SidebarGroup>
             <SidebarGroupLabel asChild>
-              <CollapsibleTrigger className="flex w-full items-center justify-between px-2 py-2 rounded-xl hover:bg-muted/50 transition-colors [&[data-state=open]>svg]:rotate-180">
-                <div className="flex items-center gap-2.5">
-                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-500/10">
-                    <Key className="h-4 w-4 text-blue-500" />
-                  </div>
-                  <span className="font-medium">App Store Connect</span>
+              <CollapsibleTrigger className="flex w-full items-center justify-between px-2 py-2 rounded-lg hover:bg-muted/40 transition-colors [&[data-state=open]>svg.chevron-icon]:rotate-180">
+                <div className="flex items-center gap-2">
+                  <Key className="h-4 w-4 text-blue-500" />
+                  <span className="text-[13px] font-medium">App Store Connect</span>
                 </div>
-                <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform duration-200" />
+                <ChevronDown className="chevron-icon h-4 w-4 text-muted-foreground transition-transform duration-200" />
               </CollapsibleTrigger>
             </SidebarGroupLabel>
             <CollapsibleContent>
@@ -963,14 +1053,12 @@ export function AppSidebar({
         <Collapsible open={gpSettingsOpen} onOpenChange={setGpSettingsOpen} className="group-data-[collapsible=icon]:hidden">
           <SidebarGroup>
             <SidebarGroupLabel asChild>
-              <CollapsibleTrigger className="flex w-full items-center justify-between px-2 py-2 rounded-xl hover:bg-muted/50 transition-colors [&[data-state=open]>svg]:rotate-180">
-                <div className="flex items-center gap-2.5">
-                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-green-500/10">
-                    <Play className="h-4 w-4 text-green-500" />
-                  </div>
-                  <span className="font-medium">Google Play</span>
+              <CollapsibleTrigger className="flex w-full items-center justify-between px-2 py-2 rounded-lg hover:bg-muted/40 transition-colors [&[data-state=open]>svg.chevron-icon]:rotate-180">
+                <div className="flex items-center gap-2">
+                  <Play className="h-4 w-4 text-green-500" />
+                  <span className="text-[13px] font-medium">Google Play</span>
                 </div>
-                <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform duration-200" />
+                <ChevronDown className="chevron-icon h-4 w-4 text-muted-foreground transition-transform duration-200" />
               </CollapsibleTrigger>
             </SidebarGroupLabel>
             <CollapsibleContent>
@@ -1154,54 +1242,34 @@ export function AppSidebar({
         </Collapsible>
       </SidebarContent>
 
-      <SidebarFooter className="border-t border-sidebar-border/50 bg-gradient-to-t from-sidebar to-transparent group-data-[collapsible=icon]:hidden">
-        <div className="px-4 py-4 space-y-4">
-          {/* Theme Toggle */}
-          <div className="flex items-center justify-between p-2 rounded-xl bg-muted/30">
-            <span className="text-xs font-medium text-muted-foreground">Theme</span>
-            <div className="flex gap-1">
+      <SidebarFooter className="border-t border-sidebar-border/50 group-data-[collapsible=icon]:hidden">
+        <div className="flex items-center justify-between px-3 py-2.5">
+          {/* Theme segmented control */}
+          <div className="flex items-center gap-0.5 rounded-lg bg-muted/40 p-0.5">
+            {[
+              { value: 'light', icon: Sun, label: 'Light mode' },
+              { value: 'dark', icon: Moon, label: 'Dark mode' },
+              { value: 'system', icon: Monitor, label: 'System theme' },
+            ].map(({ value, icon: ThemeIcon, label }) => (
               <button
-                onClick={() => setTheme('light')}
-                className={`p-2 rounded-lg transition-all ${
-                  theme === 'light' 
-                    ? 'bg-primary text-primary-foreground' 
-                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                key={value}
+                onClick={() => setTheme(value)}
+                className={`p-1.5 rounded-md transition-colors ${
+                  theme === value
+                    ? 'bg-background text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
                 }`}
-                title="Light mode"
+                title={label}
               >
-                <Sun className="h-4 w-4" />
+                <ThemeIcon className="h-3.5 w-3.5" />
               </button>
-              <button
-                onClick={() => setTheme('dark')}
-                className={`p-2 rounded-lg transition-all ${
-                  theme === 'dark' 
-                    ? 'bg-primary text-primary-foreground' 
-                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-                }`}
-                title="Dark mode"
-              >
-                <Moon className="h-4 w-4" />
-              </button>
-              <button
-                onClick={() => setTheme('system')}
-                className={`p-2 rounded-lg transition-all ${
-                  theme === 'system' 
-                    ? 'bg-primary text-primary-foreground' 
-                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-                }`}
-                title="System theme"
-              >
-                <Monitor className="h-4 w-4" />
-              </button>
-            </div>
+            ))}
           </div>
-          
-          <div className="flex items-center justify-center gap-2">
-            <span className="text-xs text-muted-foreground">Crafted with</span>
-            <span className="text-red-500">♥</span>
-            <span className="text-xs text-muted-foreground">by</span>
-            <span className="text-xs font-semibold text-foreground">Fayhe</span>
-          </div>
+
+          <span className="text-[11px] text-muted-foreground">
+            Crafted with <span className="text-red-500">♥</span> by{' '}
+            <span className="font-medium text-foreground">Fayhe</span>
+          </span>
         </div>
       </SidebarFooter>
 

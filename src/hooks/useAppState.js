@@ -4,6 +4,7 @@ import {
   PROVIDER_CONFIG_KEY,
   ASC_CONFIG_KEY,
   ASTRO_CONFIG_KEY,
+  APPCOMPETE_CONFIG_KEY,
   ACTIVE_PAGE_KEY,
   WELCOME_SHOWN_KEY
 } from '../constants'
@@ -72,6 +73,14 @@ export function useAppState(addLog) {
     return { enabled: false, port: 8089 }
   })
 
+  const [appCompeteConfig, setAppCompeteConfig] = useState(() => {
+    const saved = localStorage.getItem(APPCOMPETE_CONFIG_KEY)
+    if (saved) {
+      try { return JSON.parse(saved) } catch { /* ignore */ }
+    }
+    return { apiKey: '' }
+  })
+
   const currentApiKey = providerConfig.apiKeys[providerConfig.provider] || ''
   const currentModel = providerConfig.models[providerConfig.provider] || PROVIDERS[providerConfig.provider].defaultModel
 
@@ -90,6 +99,10 @@ export function useAppState(addLog) {
   useEffect(() => {
     localStorage.setItem(ASTRO_CONFIG_KEY, JSON.stringify(astroConfig))
   }, [astroConfig])
+
+  useEffect(() => {
+    localStorage.setItem(APPCOMPETE_CONFIG_KEY, JSON.stringify(appCompeteConfig))
+  }, [appCompeteConfig])
 
   const handleTestConnection = async () => {
     if (!currentApiKey) {
@@ -133,6 +146,8 @@ export function useAppState(addLog) {
     setGpCredentials,
     astroConfig,
     setAstroConfig,
+    appCompeteConfig,
+    setAppCompeteConfig,
     currentApiKey,
     currentModel,
     isTesting,

@@ -55,6 +55,8 @@ function App() {
           onGpCredentialsChange={appState.setGpCredentials}
           astroConfig={appState.astroConfig}
           onAstroConfigChange={appState.setAstroConfig}
+          appCompeteConfig={appState.appCompeteConfig}
+          onAppCompeteConfigChange={appState.setAppCompeteConfig}
         />
         <SidebarInset>
           <header className="sticky top-0 z-20 flex h-14 items-center gap-4 border-b border-border/50 bg-background/80 px-6 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
@@ -72,6 +74,7 @@ function App() {
                   onCredentialsChange={appState.setAscCredentials}
                   aiConfig={appState.providerConfig}
                   astroConfig={appState.astroConfig}
+                  appCompeteConfig={appState.appCompeteConfig}
                 />
               )}
 

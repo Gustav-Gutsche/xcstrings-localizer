@@ -26,3 +26,7 @@ dist-ssr
 .env
 .env.*
 .claude/
+
+# Temp files from the README screenshot script
+docs/screenshots/.demo.xcstrings
+docs/screenshots/.phone-mock.png

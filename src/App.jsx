@@ -9,6 +9,7 @@ import ScreenshotMaker from './components/ScreenshotMaker'
 import SubscriptionManager from './components/SubscriptionManager'
 import { XCStringsPage } from './components/XCStringsPage'
 import { ThemeToggle } from './components/ThemeToggle'
+import DemoShowcase from './components/DemoShowcase'
 import { useAppState } from './hooks/useAppState'
 import { useTranslation } from './hooks/useTranslation'
 import { useTranslationEditor } from './hooks/useTranslationEditor'
@@ -43,6 +44,8 @@ function App() {
   return (
     <div className="min-h-svh bg-background">
       <Toaster position="top-right" richColors closeButton />
+      {/* Feature-dialog showcase for README screenshots — dev only (?demo=…) */}
+      {import.meta.env.DEV && <DemoShowcase />}
       <SidebarProvider>
         <AppSidebar
           activePage={appState.activePage}

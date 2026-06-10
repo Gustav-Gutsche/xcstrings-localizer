@@ -1,91 +1,149 @@
-# 🚀 App Store & Play Store Localizer
+<div align="center">
 
-[![GitHub Stars](https://img.shields.io/github/stars/fayharinn/iOS-App-Distribution-Localizer.svg?style=flat)](https://github.com/fayharinn/iOS-App-Distribution-Localizer/stargazers)
-[![GitHub Issues](https://img.shields.io/github/issues/fayharinn/iOS-App-Distribution-Localizer.svg?style=flat)](https://github.com/fayharinn/iOS-App-Distribution-Localizer/issues)
-[![License: AGPLv3](https://img.shields.io/badge/License-AGPLv3-yellow.svg)](https://www.gnu.org/licenses/agpl-3.0.html)
-[![Last Commit](https://img.shields.io/github/last-commit/fayharinn/iOS-App-Distribution-Localizer.svg?style=flat)](https://github.com/fayharinn/iOS-App-Distribution-Localizer/commits/main)
+# 🌍 StoreLocalizer
 
-**The all-in-one toolkit to grow your app globally.** Localize your App Store and Google Play listings, optimize subscription pricing by country, and generate stunning screenshots — all connected directly to App Store Connect and Google Play Console.
+**Ship your app worldwide — translate, price, and design your store listings with AI.**
 
-🌐 **Try it now:** [localizer.fayhe.com](https://localizer.fayhe.com/)
+[![Try it live](https://img.shields.io/badge/▶_Try_it_live-localizer.fayhe.com-7c5cff?style=for-the-badge)](https://localizer.fayhe.com/)
 
----
+[![GitHub Stars](https://img.shields.io/github/stars/fayharinn/StoreLocalizer.svg?style=flat&logo=github&color=ffd166)](https://github.com/fayharinn/StoreLocalizer/stargazers)
+[![License: AGPLv3](https://img.shields.io/badge/License-AGPLv3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0.html)
+[![Last Commit](https://img.shields.io/github/last-commit/fayharinn/StoreLocalizer.svg?style=flat&color=4ade80)](https://github.com/fayharinn/StoreLocalizer/commits/main)
+[![Follow on X](https://img.shields.io/badge/Follow-@fayhecode-black?style=flat&logo=x)](https://x.com/fayhecode)
 
-## Why App Store & Play Store Localizer?
+*One tool for the whole store pipeline: `.xcstrings` translation · App Store Connect & Google Play sync ·
+ASO keywords · device screenshots · GDP-fair subscription pricing.*
 
-Expanding your app internationally is painful:
-- Translating metadata manually takes forever
-- Pricing subscriptions fairly across 175 countries is guesswork
-- Creating localized screenshots for every language is tedious
-- Managing both iOS and Android stores doubles the work
+<img src="docs/screenshots/xcstrings-editor.png" width="900" alt="StoreLocalizer — translations editor" />
 
-**App Store & Play Store Localizer solves all of this in one place.**
+</div>
 
 ---
 
-## ✨ Features
+## Why?
 
-### 🌍 AI-Powered Localization
+Going global is brutal when you do it by hand:
 
-![App Store Connect](.github/aso.png)
+|  | The manual way | With StoreLocalizer |
+|---|---|---|
+| 🌍 Localizing 40+ languages | Weeks of copy-paste | **Minutes** — batched AI translation, synced to your stores |
+| 💸 Pricing in 175 countries | Guesswork | **GDP-adjusted** recommendations per market |
+| 📸 Screenshots per language | A designer's nightmare | **Generated** for every locale from one template |
+| 🔑 ASO keywords per locale | Spreadsheets | **Suggested, scored & reviewed** per keyword |
 
-Translate your entire App Store and Google Play listings to 40+ languages in minutes, not days.
-
-- One-click translation of app name, subtitle, description, keywords, and what's new
-- AI-powered with OpenAI or AWS Bedrock (Claude)
-- Protected words to keep brand names untranslated
-- Direct sync with App Store Connect and Google Play Console — no copy-paste needed
-- Manage screenshots and graphics for both platforms
-
-### 💰 Smart Subscription Pricing
-
-![Price Optimization](.github/priceoptimization.png)
-
-Stop leaving money on the table. Set fair prices based on each country's purchasing power.
-
-- GDP-adjusted pricing recommendations for 40+ countries
-- See current vs recommended prices at a glance
-- One-click price updates directly to App Store Connect
-- Automatic currency conversion and price point matching
-
-### 📱 Screenshot Generator
-
-![Screenshot Maker](.github/screenshots.png)
-
-Create professional App Store screenshots with device mockups in seconds.
-
-- 2D and 3D device frames (iPhone, Android)
-- Multi-language headlines with AI translation
-- Custom backgrounds, shadows, and layouts
-- Batch export all languages as ZIP
+Everything talks **directly** to App Store Connect and Google Play Console — no exports, no copy-paste.
 
 ---
 
-## 🚀 Quick Start
+## ✨ The toolkit
 
-### Online (Recommended)
-Just visit **[localizer.fayhe.com](https://localizer.fayhe.com/)** — no installation needed.
+### 🔤 XCStrings Translator
 
-### Self-Hosted
+Drop an `.xcstrings` file from Xcode, pick your target languages, translate everything with AI, and export straight back to your project. Format specifiers (`%lld`, `%@`) and protected brand words are preserved, and batched + concurrent requests make 1,000 strings a coffee-break job. Every translation stays one click away from a manual fix:
+
+<div align="center"><img src="docs/screenshots/feature-edit-translation.png" width="620" alt="Edit translation dialog" /></div>
+
+### 🔑 ASO keywords that earn their 100 characters
+
+Generate keywords with AI — or plug your **[AppCompete](https://appcompete.com)** account and work with real data: suggestions scored by popularity & difficulty with a live capacity gauge, keywords mined from the competitors you track, and a **per-keyword review** that tells you what to keep, replace, or stop dreaming about:
+
+<table align="center"><tr>
+<td><img src="docs/screenshots/feature-keyword-suggestions.png" alt="AppCompete keyword suggestions with popularity and difficulty scores" /></td>
+<td><img src="docs/screenshots/feature-keyword-review.png" alt="Keyword review verdicts: great, ok, weak, hard, untracked" /></td>
+</tr><tr>
+<td align="center"><em>Suggestions scored by opportunity, capped at Apple's 100 chars</em></td>
+<td align="center"><em>One verdict + one advice per keyword — track the missing ones</em></td>
+</tr></table>
+
+### 🏪 App Store Connect & Google Play sync
+
+Connect once with your API keys — then translate descriptions, what's new, keywords and promotional text across every locale, manage screenshots, create versions, and push everything back **without leaving the browser**.
+
+<div align="center"><img src="docs/screenshots/app-store-connect.png" width="860" alt="App Store Connect integration" /></div>
+
+### 📸 Screenshot Studio
+
+A device-frame screenshot generator that lives next to your translations. Gradient preset galleries, 2D/3D frames (Three.js), AI-generated marketing headlines, one-click caption translation to every project language — then export all locales as a ZIP, sized for any store format.
+
+<table align="center"><tr>
+<td width="62%"><img src="docs/screenshots/screenshot-studio.png" alt="Screenshot studio workspace" /></td>
+<td><img src="docs/screenshots/feature-canvas.png" alt="Rendered device frame on gradient background" /></td>
+</tr><tr>
+<td align="center"><em>The studio: projects, languages, style presets, batch export</em></td>
+<td align="center"><em>What ships to the store</em></td>
+</tr></table>
+
+### 💰 GDP-fair subscription pricing
+
+Set your USA base price and get a recommended price for every storefront based on local purchasing power — then push them to App Store Connect and translate your subscription display names while you're at it.
+
+<div align="center"><img src="docs/screenshots/feature-gdp-chart.png" width="820" alt="GDP-adjusted recommended prices by country" /></div>
+
+---
+
+## 🤖 Bring your own AI
+
+Pick a provider in the sidebar, paste a key, done — keys never leave your browser.
+
+| Provider | Models | Notes |
+|---|---|---|
+| **OpenAI** | gpt-5.4-nano · gpt-5.4-mini · gpt-5.5 | model list fetched live from your account |
+| **Anthropic (Claude)** | haiku-4.5 · sonnet-4.6 · opus-4.8 | direct browser access |
+| **Google (Gemini)** | 3.1-flash-lite · 3.5-flash · 3.1-pro | JSON-native responses |
+| **DeepSeek** | v4-flash · v4-pro | |
+| **Cloudflare Workers AI** | Llama 3.3/4 · GPT-OSS · Mistral… | 13 open-weight LLMs |
+| **AWS Bedrock** | Claude family | bearer-token auth |
+| **Azure OpenAI** | your deployments | |
+| **GitHub Models** | gpt-4o · gpt-4.1 | free-tier friendly |
+
+---
+
+## 🚀 Quick start
+
 ```bash
-git clone https://github.com/fayharinn/iOS-App-Distribution-Localizer.git
-cd iOS-App-Distribution-Localizer
-npm install
-npm run dev
+git clone https://github.com/fayharinn/StoreLocalizer.git
+cd StoreLocalizer
+bun install        # or npm install
+bun run dev        # → http://localhost:5173
+```
+
+That's it for local use — the dev server proxies all App Store Connect / Google Play calls for you.
+
+**No install?** Use the hosted version at **[localizer.fayhe.com](https://localizer.fayhe.com/)**.
+
+**Desktop app** (Tauri 2, Rust toolchain required):
+
+```bash
+bun run tauri:dev      # develop
+bun run tauri:build    # package
 ```
 
 ---
 
-## 🔐 Security First
-
-Your credentials never leave your browser:
-- `.p8` private keys are encrypted locally with your password
-- JWT tokens are generated client-side
-- No data is sent to any third-party server
-- Open source — audit the code yourself
+## ⚙️ Connect your stores
 
 <details>
-<summary>View App Store Connect authentication flow</summary>
+<summary><b>App Store Connect API key</b></summary>
+
+1. Go to [App Store Connect → Integrations → API Keys](https://appstoreconnect.apple.com/access/integrations/api)
+2. Create a key with **Admin** or **App Manager** role
+3. Note your **Key ID** and **Issuer ID**, download the `.p8` file
+4. Drop everything in the app sidebar — the `.p8` is encrypted with your password before being stored
+
+</details>
+
+<details>
+<summary><b>Google Play service account</b></summary>
+
+1. In [Google Cloud Console](https://console.cloud.google.com/), create a service account with the **Google Play Developer API** enabled and download its JSON key
+2. In Play Console → **Users and permissions**, invite the service account email
+3. Grant **Admin** or **Release manager** for your app
+4. Upload the JSON key in the app sidebar
+
+</details>
+
+<details>
+<summary><b>App Store Connect auth flow (how your .p8 stays safe)</b></summary>
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -110,7 +168,7 @@ Your credentials never leave your browser:
 │  ┌──────────────┐                                                           │
 │  │ sessionStorage│ ◄─── JWT cached for ~19 min                              │
 │  │  (JWT only)   │      Auto-reconnect on page reload                       │
-│  └──────┬───────┘       Timer shows remaining time                          │
+│  └──────┬───────┘                                                           │
 │         │                                                                   │
 │         │ Bearer token                                                      │
 │         ▼                                                                   │
@@ -124,153 +182,61 @@ Your credentials never leave your browser:
 
 </details>
 
-<details>
-<summary>View Google Play Console authentication flow</summary>
-
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                      Google Play Console Auth Flow                          │
-│                     (OAuth2 JWT Bearer for Service Accounts)                │
-├─────────────────────────────────────────────────────────────────────────────┤
-│                                                                             │
-│  ┌────────────────┐                                                         │
-│  │ Service Account│ ◄─── JSON file from Google Cloud Console                │
-│  │   JSON File    │      Contains: client_email, private_key                │
-│  └───────┬────────┘                                                         │
-│          │                                                                  │
-│          │ parse & extract                                                  │
-│          ▼                                                                  │
-│  ┌────────────────┐                                                         │
-│  │  Private Key   │ ◄─── RSA private key (RS256)                            │
-│  │  + Client Email│      In memory only (not persisted)                     │
-│  └───────┬────────┘                                                         │
-│          │                                                                  │
-│          │ sign JWT claim                                                   │
-│          ▼                                                                  │
-│  ┌────────────────┐      JWT Payload:                                       │
-│  │   Signed JWT   │      • iss: client_email                                │
-│  │   Assertion    │      • scope: androidpublisher                          │
-│  └───────┬────────┘      • aud: oauth2.googleapis.com/token                 │
-│          │               • iat/exp: timestamps                              │
-│          │                                                                  │
-│          │ POST to Google OAuth2                                            │
-│          ▼                                                                  │
-│  ┌────────────────┐                                                         │
-│  │    Google      │                                                         │
-│  │  OAuth2 Token  │ ◄─── https://oauth2.googleapis.com/token                │
-│  │    Endpoint    │      grant_type: jwt-bearer                             │
-│  └───────┬────────┘                                                         │
-│          │                                                                  │
-│          │ returns access_token                                             │
-│          ▼                                                                  │
-│  ┌────────────────┐                                                         │
-│  │ sessionStorage │ ◄─── Access token cached for ~1 hour                    │
-│  │ (token + expiry)│     Auto-refresh when expired                          │
-│  └───────┬────────┘      Timer shows remaining time                         │
-│          │                                                                  │
-│          │ Bearer token                                                     │
-│          ▼                                                                  │
-│  ┌────────────────┐                                                         │
-│  │  Google Play   │                                                         │
-│  │  Developer API │ ◄─── androidpublisher/v3/applications/{packageName}     │
-│  └────────────────┘                                                         │
-│                                                                             │
-│  ┌─────────────────────────────────────────────────────────────────────┐    │
-│  │ Edit Session Workflow:                                              │    │
-│  │                                                                     │    │
-│  │   Create Edit ──► Make Changes ──► Commit Edit                      │    │
-│  │       │              │                  │                           │    │
-│  │       │              │                  └──► Changes go live        │    │
-│  │       │              │                                              │    │
-│  │       │              └──► Update listings, upload images            │    │
-│  │       │                                                             │    │
-│  │       └──► Returns editId (required for all operations)             │    │
-│  │                                                                     │    │
-│  │   Note: Uncommitted edits expire automatically                      │    │
-│  └─────────────────────────────────────────────────────────────────────┘    │
-│                                                                             │
-└─────────────────────────────────────────────────────────────────────────────┘
-```
-
-</details>
+**Security model in one paragraph:** your `.p8` key is encrypted in-browser (AES-GCM, PBKDF2 100k iterations) before touching `localStorage`; the decrypted key only ever exists in memory. JWTs are signed client-side with [jose](https://github.com/panva/jose). AI provider keys go straight from your browser to the provider. The only backend is a thin CORS proxy that forwards your `Authorization` header — it stores nothing. It's all open source: audit it.
 
 ---
 
-## ⚙️ Setup
+## 🛠️ Production deployment
 
-### App Store Connect API
-1. Go to [App Store Connect > API Keys](https://appstoreconnect.apple.com/access/integrations/api)
-2. Create a key with Admin or App Manager role
-3. Note your **Key ID** and **Issuer ID**
-4. Download the `.p8` file
-5. Enter credentials in the app sidebar
-
-### Google Play Console API
-1. Go to [Google Cloud Console](https://console.cloud.google.com/)
-2. Create a service account in your project, with Google Play Developer API enabled
-3. Download the JSON key file
-4. In Play Console → Users and permissions → Invite new users
-5. Add the service account email (from the JSON file)
-6. Grant "Admin" or "Release manager" permission for your app
-7. Upload the JSON key in the app sidebar
-
-### AI Translation
-Configure in the sidebar:
-| Provider | API Key Format |
-|----------|---------------|
-| OpenAI | `sk-...` |
-| AWS Bedrock | `ACCESS_KEY:SECRET_KEY` |
-
----
-
-## 🛠 Tech Stack
-
-- **React 19** + **Vite** — Fast, modern frontend
-- **Tailwind CSS** + **shadcn/ui** — Beautiful UI components
-- **Three.js** — 3D device mockups
-- **jose** — JWT signing for App Store Connect
-
----
-
-## 🌐 Deployment
-
-The App Store Connect API doesn't support CORS. For production, deploy with Cloudflare:
+The web app is static (Vite). Apple & Google block browser CORS, so production needs the bundled Cloudflare Worker as a proxy:
 
 ```bash
-# Deploy API proxy
+# 1. Deploy the CORS proxy worker
 wrangler deploy -c wrangler.proxy.jsonc
 
-# Set proxy URL
-echo "VITE_ASC_PROXY_URL=https://your-proxy.workers.dev" > .env.production
+# 2. Point the site at it
+echo 'VITE_ASC_PROXY_URL=https://your-worker.workers.dev' >> .env.production
+echo 'VITE_GP_PROXY_URL=https://your-worker.workers.dev'  >> .env.production
 
-# Deploy site
-npm run build
-wrangler pages deploy dist
+# 3. Ship the site
+bun run deploy:cloudflare   # Cloudflare Pages
+bun run deploy              # …or GitHub Pages
+```
+
+Remember to add your domain to `ALLOWED_ORIGINS` in [worker/index.js](worker/index.js).
+
+---
+
+## 🧱 Tech stack
+
+**React 19** + **Vite** · **Tailwind** + **shadcn/ui** · **Three.js** (3D device frames) · **jose** (ES256 JWT signing in-browser) · **Tauri 2** (desktop) · **Cloudflare Workers** (CORS proxy)
+
+```text
+src/
+├── components/        # five pages: xcstrings · appstore · googleplay · screenshots · subscriptions
+├── hooks/             # top-level state (useAppState, useTranslation, …)
+├── services/          # every external call: ASC, Google Play, 8 AI providers, AppCompete
+└── utils/             # xcstrings parser, AES-GCM crypto
 ```
 
 ---
 
 ## 🤝 Contributing
 
-Contributions welcome! Feel free to open issues or submit PRs.
+Issues and PRs are welcome! Run `bun run lint` before submitting. The screenshots in this README are generated with `node scripts/take-screenshots.mjs` against the dev server.
 
----
+**Contributors:** [isnine](https://github.com/isnine) (Azure OpenAI) · [krrskl](https://github.com/krrskl) (GitHub Models)
+
+**Credits:** screenshot generator originally based on [appscreen](https://github.com/YUZU-Hub/appscreen) by Stefan from yuzuhub.com.
 
 ## 📄 License
 
-GNU AGPLv3 — Free to use, modify, and distribute with attribution.
+[AGPLv3](LICENSE) — free to use, modify and self-host; derivatives must stay open source.
 
----
+<div align="center">
 
-## 🙏 Credits
+Crafted with ❤️ by **[Fayhe](https://github.com/fayharinn)**
 
-Screenshot generator based on [appscreen](https://github.com/YUZU-Hub/appscreen) by Stefan from yuzuhub.com
+⭐ *If this saves you a localization weekend, a star helps others find it.*
 
-## 👥 Contributors
-
-- [isnine](https://github.com/isnine) — Azure OpenAI support
-- [krrskl](https://github.com/krrskl) Github models support
-
----
-
-[![Follow on X](https://img.shields.io/badge/Follow-@fayhecode-black?style=for-the-badge&logo=x)](https://x.com/fayhecode)
+</div>

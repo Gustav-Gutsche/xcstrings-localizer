@@ -332,7 +332,7 @@ export default function ASOKeywordsCard({
   )
 }
 
-function CompetitorPickerDialog({ picker, onClose, onPick }) {
+export function CompetitorPickerDialog({ picker, onClose, onPick }) {
   if (!picker) return null
   return (
     <Dialog open={!!picker} onOpenChange={(open) => { if (!open) onClose() }}>
@@ -382,7 +382,7 @@ const VERDICT_STYLES = {
   unknown: { label: 'Untracked', className: 'bg-muted text-muted-foreground' },
 }
 
-function KeywordReviewDialog({ review, onClose, onTrack }) {
+export function KeywordReviewDialog({ review, onClose, onTrack }) {
   const [isTracking, setIsTracking] = useState(false)
   if (!review) return null
 
@@ -467,7 +467,7 @@ function KeywordReviewDialog({ review, onClose, onTrack }) {
   )
 }
 
-function AstroSuggestionsDialog({ astroSuggestions, onClose, onApply, isSaving }) {
+export function AstroSuggestionsDialog({ astroSuggestions, onClose, onApply, isSaving }) {
   const [selected, setSelected] = useState(new Set())
   const [search, setSearch] = useState('')
   const [sortBy, setSortBy] = useState('popularity')

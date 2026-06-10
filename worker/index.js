@@ -6,6 +6,7 @@
 const ASC_API_BASE = 'https://api.appstoreconnect.apple.com'
 const GP_API_BASE = 'https://androidpublisher.googleapis.com'
 const GP_STORE_BASE = 'https://play.google.com'
+const APPCOMPETE_API_BASE = 'https://appcompete.com/api'
 
 // Allowed origins
 const ALLOWED_ORIGINS = [
@@ -79,6 +80,9 @@ export default {
     if (path.startsWith('/androidpublisher/')) {
       // Google Play API
       targetUrl = `${GP_API_BASE}${path}${url.search}`
+    } else if (path.startsWith('/appcompete/')) {
+      // AppCompete MCP (Rank Tracker / ASO) — /appcompete/mcp → https://appcompete.com/api/mcp
+      targetUrl = `${APPCOMPETE_API_BASE}${path.replace(/^\/appcompete/, '')}${url.search}`
     } else {
       // Default to App Store Connect API
       targetUrl = `${ASC_API_BASE}${path}${url.search}`

@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { Textarea } from '@/components/ui/textarea'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Sparkles, CheckCircle2, AlertCircle, Loader2, ChevronDown, Search, TrendingUp, Edit3, Plus, X, ArrowUpDown } from 'lucide-react'
+import { Sparkles, CheckCircle2, AlertCircle, Loader2, ChevronDown, Search, TrendingUp, Edit3, Plus, X, ArrowUpDown, Users, ClipboardCheck } from 'lucide-react'
 import { ASC_LOCALES } from '@/services/appStoreConnectService'
 
 export default function ASOKeywordsCard({
@@ -26,6 +26,16 @@ export default function ASOKeywordsCard({
   startEditingKeywords,
   cancelEditingKeywords,
   saveEditedKeywords,
+  appCompeteEnabled,
+  appCompeteLoadingFor,
+  appCompetePicker,
+  onCloseCompetitorPicker,
+  onPickCompetitor,
+  onLoadCompetitors,
+  keywordReview,
+  onCloseKeywordReview,
+  onReviewKeywords,
+  onTrackKeywords,
 }) {
   return (
   <>
@@ -39,9 +49,13 @@ export default function ASOKeywordsCard({
             <CardTitle className="text-lg">ASO Keywords</CardTitle>
             <CardDescription className="flex items-center gap-2">
               Optimize keywords for each locale
-              {astroEnabled ? (
+              {appCompeteEnabled && (
+                <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4 bg-sky-500/10 text-sky-500 border-0">AppCompete</Badge>
+              )}
+              {astroEnabled && (
                 <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4 bg-orange-500/10 text-orange-500 border-0">Astro</Badge>
-              ) : (
+              )}
+              {!appCompeteEnabled && !astroEnabled && (
                 <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4 bg-primary/10 text-primary border-0">AI</Badge>
               )}
             </CardDescription>
@@ -218,14 +232,48 @@ export default function ASOKeywordsCard({
 
                       {editingKeywordsFor !== loc.locale && (
                         <>
-                          <div className="flex gap-2 w-full">
+                          <div className="flex flex-wrap gap-2 w-full">
+                            {appCompeteEnabled && (
+                              <>
+                                <Button
+                                  onClick={(e) => { e.stopPropagation(); handleGenerateASOKeywords(loc.locale, 'appcompete') }}
+                                  disabled={isGenerating}
+                                  variant="outline"
+                                  size="sm"
+                                  className="flex-1 h-9 min-w-[110px] border-sky-500/30 text-sky-600 dark:text-sky-400 hover:bg-sky-500/10"
+                                >
+                                  {isGenerating ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" /> : <TrendingUp className="h-3.5 w-3.5 mr-1.5" />}
+                                  Suggest
+                                </Button>
+                                <Button
+                                  onClick={(e) => { e.stopPropagation(); onLoadCompetitors(loc.locale) }}
+                                  disabled={appCompeteLoadingFor === `${loc.locale}:competitors`}
+                                  variant="outline"
+                                  size="sm"
+                                  className="flex-1 h-9 min-w-[110px] border-sky-500/30 text-sky-600 dark:text-sky-400 hover:bg-sky-500/10"
+                                >
+                                  {appCompeteLoadingFor === `${loc.locale}:competitors` ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" /> : <Users className="h-3.5 w-3.5 mr-1.5" />}
+                                  Competitors
+                                </Button>
+                                <Button
+                                  onClick={(e) => { e.stopPropagation(); onReviewKeywords(loc.locale) }}
+                                  disabled={appCompeteLoadingFor === `${loc.locale}:review` || !loc.keywords}
+                                  variant="outline"
+                                  size="sm"
+                                  className="flex-1 h-9 min-w-[110px] border-sky-500/30 text-sky-600 dark:text-sky-400 hover:bg-sky-500/10"
+                                >
+                                  {appCompeteLoadingFor === `${loc.locale}:review` ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" /> : <ClipboardCheck className="h-3.5 w-3.5 mr-1.5" />}
+                                  Review
+                                </Button>
+                              </>
+                            )}
                             {astroEnabled && (
                               <Button
                                 onClick={(e) => { e.stopPropagation(); handleGenerateASOKeywords(loc.locale, 'astro') }}
                                 disabled={isGenerating}
                                 variant="outline"
                                 size="sm"
-                                className="flex-1 h-9"
+                                className="flex-1 h-9 min-w-[110px]"
                               >
                                 {isGenerating ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" /> : <TrendingUp className="h-3.5 w-3.5 mr-1.5" />}
                                 Astro
@@ -236,17 +284,17 @@ export default function ASOKeywordsCard({
                               disabled={isGenerating || !currentAiApiKey}
                               variant="outline"
                               size="sm"
-                              className={astroEnabled ? 'flex-1 h-9' : 'w-full h-9'}
+                              className={(astroEnabled || appCompeteEnabled) ? 'flex-1 h-9 min-w-[110px]' : 'w-full h-9'}
                             >
-                              {isGenerating && !astroEnabled ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" /> : <Sparkles className="h-3.5 w-3.5 mr-1.5" />}
+                              {isGenerating && !astroEnabled && !appCompeteEnabled ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" /> : <Sparkles className="h-3.5 w-3.5 mr-1.5" />}
                               AI Generate
                             </Button>
                           </div>
 
-                          {!currentAiApiKey && !astroEnabled && (
+                          {!currentAiApiKey && !astroEnabled && !appCompeteEnabled && (
                             <p className="text-xs text-amber-500 flex items-center gap-1">
                               <AlertCircle className="h-3 w-3" />
-                              Configure AI API key in sidebar or enable Astro
+                              Configure AI API key or AppCompete in the sidebar
                             </p>
                           )}
                         </>
@@ -268,7 +316,154 @@ export default function ASOKeywordsCard({
       onApply={onApplyAstroSuggestions}
       isSaving={isSavingKeywords}
     />
+
+    <CompetitorPickerDialog
+      picker={appCompetePicker}
+      onClose={onCloseCompetitorPicker}
+      onPick={onPickCompetitor}
+    />
+
+    <KeywordReviewDialog
+      review={keywordReview}
+      onClose={onCloseKeywordReview}
+      onTrack={onTrackKeywords}
+    />
   </>
+  )
+}
+
+function CompetitorPickerDialog({ picker, onClose, onPick }) {
+  if (!picker) return null
+  return (
+    <Dialog open={!!picker} onOpenChange={(open) => { if (!open) onClose() }}>
+      <DialogContent className="sm:max-w-sm">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2 text-base">
+            <Users className="h-4 w-4 text-sky-500" />
+            Pick a competitor
+          </DialogTitle>
+          <DialogDescription className="text-xs">
+            Apps tracked on your AppCompete dashboard
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-1 max-h-[50vh] overflow-y-auto">
+          {picker.apps.map((app) => (
+            <button
+              key={app.appleId}
+              onClick={() => onPick(app)}
+              className="flex w-full items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted/50 transition-colors text-left"
+            >
+              {app.icon ? (
+                <img src={app.icon} alt="" className="h-8 w-8 rounded-lg" />
+              ) : (
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted text-xs font-semibold">
+                  {app.name.charAt(0)}
+                </div>
+              )}
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium truncate">{app.name}</p>
+                <p className="text-[11px] text-muted-foreground">
+                  {app.keywordCount != null ? `${app.keywordCount} tracked keywords` : `Apple ID ${app.appleId}`}
+                </p>
+              </div>
+            </button>
+          ))}
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+const VERDICT_STYLES = {
+  great: { label: 'Great', className: 'bg-emerald-500/10 text-emerald-500' },
+  ok: { label: 'OK', className: 'bg-sky-500/10 text-sky-500' },
+  weak: { label: 'Weak', className: 'bg-amber-500/10 text-amber-500' },
+  hard: { label: 'Hard', className: 'bg-red-500/10 text-red-500' },
+  unknown: { label: 'Untracked', className: 'bg-muted text-muted-foreground' },
+}
+
+function KeywordReviewDialog({ review, onClose, onTrack }) {
+  const [isTracking, setIsTracking] = useState(false)
+  if (!review) return null
+
+  const untracked = review.items.filter(i => !i.tracked).map(i => i.keyword)
+  const needAttention = review.items.filter(i => i.verdict === 'weak' || i.verdict === 'hard').length
+
+  return (
+    <Dialog open={!!review} onOpenChange={(open) => { if (!open) onClose() }}>
+      <DialogContent className="sm:max-w-[640px]">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2 text-base">
+            <ClipboardCheck className="h-4 w-4 text-sky-500" />
+            Keyword Review — {review.localeName}
+          </DialogTitle>
+          <DialogDescription className="text-xs">
+            {review.items.length} keywords analyzed with AppCompete
+            {needAttention > 0 && <span className="text-amber-500"> — {needAttention} need attention</span>}
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="max-h-[55vh] overflow-y-auto -mx-1 px-1">
+          <table className="w-full text-sm">
+            <thead className="sticky top-0 bg-background z-10">
+              <tr className="border-b border-border/50 text-xs text-muted-foreground">
+                <th className="py-2 text-left font-medium">Keyword</th>
+                <th className="py-2 text-right font-medium w-12">Pos</th>
+                <th className="py-2 text-right font-medium w-12">Pop</th>
+                <th className="py-2 text-right font-medium w-12">Diff</th>
+                <th className="py-2 text-left font-medium pl-3 w-24">Verdict</th>
+              </tr>
+            </thead>
+            <tbody>
+              {review.items.map((item) => {
+                const v = VERDICT_STYLES[item.verdict] || VERDICT_STYLES.unknown
+                return (
+                  <tr key={item.keyword} className="border-b border-border/30 align-top">
+                    <td className="py-2">
+                      <span className="font-medium">{item.keyword}</span>
+                      <p className="text-[11px] text-muted-foreground mt-0.5">{item.advice}</p>
+                    </td>
+                    <td className="py-2 text-right tabular-nums">{item.position ?? '—'}</td>
+                    <td className="py-2 text-right tabular-nums">{item.popularity ?? '—'}</td>
+                    <td className="py-2 text-right tabular-nums">{item.difficulty ?? '—'}</td>
+                    <td className="py-2 pl-3">
+                      <span className={`inline-block px-2 py-0.5 rounded-md text-[11px] font-medium ${v.className}`}>
+                        {v.label}
+                      </span>
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
+
+        <DialogFooter className="flex items-center justify-between sm:justify-between">
+          <span className="text-[11px] text-muted-foreground">
+            {untracked.length > 0 ? `${untracked.length} keyword(s) not tracked yet` : 'All keywords tracked'}
+          </span>
+          <div className="flex gap-2">
+            {untracked.length > 0 && (
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={isTracking}
+                onClick={async () => {
+                  setIsTracking(true)
+                  await onTrack(untracked)
+                  setIsTracking(false)
+                }}
+                className="border-sky-500/30 text-sky-600 dark:text-sky-400 hover:bg-sky-500/10"
+              >
+                {isTracking ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" /> : <Plus className="h-3.5 w-3.5 mr-1.5" />}
+                Track on AppCompete
+              </Button>
+            )}
+            <Button size="sm" variant="ghost" onClick={onClose}>Close</Button>
+          </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }
 
@@ -349,7 +544,7 @@ function AstroSuggestionsDialog({ astroSuggestions, onClose, onApply, isSaving }
               <TrendingUp className="h-4 w-4 text-white" />
             </div>
             <div>
-              <DialogTitle className="text-base">Astro Suggestions</DialogTitle>
+              <DialogTitle className="text-base">{astroSuggestions.title || 'Astro Suggestions'}</DialogTitle>
               <DialogDescription className="text-xs">{astroSuggestions.localeName} — {suggestions.length} keywords</DialogDescription>
             </div>
           </div>

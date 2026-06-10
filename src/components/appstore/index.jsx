@@ -17,6 +17,7 @@ import {
   VERSION_TRANSLATION_PROMPTS_KEY,
   LEGACY_EVENT_PROMPT_KEY,
   LEGACY_SHARED_PROMPT_KEY,
+  isLocalEnvironment,
 } from '@/constants'
 
 const EVENT_PROMPT_FIELDS = [
@@ -41,7 +42,7 @@ import TranslationCard from './TranslationCard'
 import EventsCard from './EventsCard'
 import TranslationPromptDialog from './TranslationPromptDialog'
 
-export default function AppStoreConnect({ credentials, onCredentialsChange, aiConfig, astroConfig }) {
+export default function AppStoreConnect({ credentials, onCredentialsChange, aiConfig, astroConfig, appCompeteConfig }) {
   // Each section has its own set of per-field prompts — different char limits, different content.
   const eventPrompt = useAscTranslationPrompt(EVENT_TRANSLATION_PROMPTS_KEY, {
     fields: EVENT_PROMPT_FIELDS.map(f => f.key),
@@ -51,7 +52,7 @@ export default function AppStoreConnect({ credentials, onCredentialsChange, aiCo
     fields: VERSION_PROMPT_FIELDS.map(f => f.key),
     legacyKey: LEGACY_SHARED_PROMPT_KEY,
   })
-  const hook = useAppStoreConnect({ credentials, onCredentialsChange, aiConfig, astroConfig, translationPrompts: versionPrompt.prompts })
+  const hook = useAppStoreConnect({ credentials, onCredentialsChange, aiConfig, astroConfig, appCompeteConfig, translationPrompts: versionPrompt.prompts })
   const eventsHook = useAppEvents({ credentials, selectedApp: hook.selectedApp, aiConfig, translationPrompts: eventPrompt.prompts })
 
   return (
@@ -135,7 +136,7 @@ export default function AppStoreConnect({ credentials, onCredentialsChange, aiCo
           setEditedKeywords={hook.setEditedKeywords}
           isSavingKeywords={hook.isSavingKeywords}
           currentAiApiKey={hook.currentAiApiKey}
-          astroEnabled={astroConfig?.enabled}
+          astroEnabled={astroConfig?.enabled && isLocalEnvironment()}
           astroSuggestions={hook.astroSuggestions}
           onAstroSuggestionsClose={() => hook.setAstroSuggestions(null)}
           onApplyAstroSuggestions={hook.handleApplyAstroSuggestions}
@@ -144,6 +145,16 @@ export default function AppStoreConnect({ credentials, onCredentialsChange, aiCo
           startEditingKeywords={hook.startEditingKeywords}
           cancelEditingKeywords={hook.cancelEditingKeywords}
           saveEditedKeywords={hook.saveEditedKeywords}
+          appCompeteEnabled={!!appCompeteConfig?.apiKey}
+          appCompeteLoadingFor={hook.appCompeteLoadingFor}
+          appCompetePicker={hook.appCompetePicker}
+          onCloseCompetitorPicker={() => hook.setAppCompetePicker(null)}
+          onPickCompetitor={hook.handlePickCompetitor}
+          onLoadCompetitors={hook.handleAppCompeteCompetitors}
+          keywordReview={hook.keywordReview}
+          onCloseKeywordReview={() => hook.setKeywordReview(null)}
+          onReviewKeywords={hook.handleReviewKeywords}
+          onTrackKeywords={hook.handleTrackKeywords}
         />
       )}
 

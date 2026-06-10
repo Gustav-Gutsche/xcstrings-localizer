@@ -127,6 +127,13 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/astro/, ''),
       },
+      // AppCompete MCP (Rank Tracker / ASO) — /api/appcompete/mcp → https://appcompete.com/api/mcp
+      '/api/appcompete': {
+        target: 'https://appcompete.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/appcompete/, '/api'),
+        secure: true,
+      },
     },
   },
 })

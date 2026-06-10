@@ -28,7 +28,7 @@ import { decrypt } from '@/utils/crypto'
 
 const ENCRYPTED_KEY_STORAGE = 'asc-encrypted-p8-key'
 
-export default function useAppStoreConnect({ credentials, onCredentialsChange, aiConfig, astroConfig, translationPrompts }) {
+export default function useAppStoreConnect({ credentials, onCredentialsChange, aiConfig, astroConfig, appCompeteConfig, translationPrompts }) {
   const [isConnecting, setIsConnecting] = useState(false)
   const [connectionStatus, setConnectionStatus] = useState(null)
   const [sessionTimeLeft, setSessionTimeLeft] = useState(0)
@@ -152,6 +152,10 @@ export default function useAppStoreConnect({ credentials, onCredentialsChange, a
   const [editedKeywords, setEditedKeywords] = useState('')
   const [isSavingKeywords, setIsSavingKeywords] = useState(false)
   const [astroSuggestions, setAstroSuggestions] = useState(null)
+  // AppCompete (Rank Tracker / ASO) state
+  const [appCompetePicker, setAppCompetePicker] = useState(null) // { locale, apps: [...] }
+  const [keywordReview, setKeywordReview] = useState(null) // { locale, localeName, items: [...] }
+  const [appCompeteLoadingFor, setAppCompeteLoadingFor] = useState(null) // `${locale}:${action}`
 
   const [screenshotsByLocale, setScreenshotsByLocale] = useState({})
   const [isLoadingScreenshots, setIsLoadingScreenshots] = useState(false)
@@ -506,6 +510,153 @@ export default function useAppStoreConnect({ credentials, onCredentialsChange, a
     setAstroSuggestions(null)
   }
 
+  // ---------------------------------------------------------------------------
+  // AppCompete — keyword suggestions, competitor keywords, keyword review
+  // ---------------------------------------------------------------------------
+
+  const appCompeteKey = appCompeteConfig?.apiKey || ''
+  const countryFromLocale = (locale) => locale.split('-').pop()?.toLowerCase() || 'us'
+
+  const fetchAppCompeteSuggestions = async (locale, localization, localeName) => {
+    if (!appCompeteKey || !selectedApp) return false
+
+    try {
+      const { getKeywordSuggestions } = await import('@/services/appCompeteService')
+      const country = countryFromLocale(locale)
+      addLog(`Fetching AppCompete suggestions for ${localeName} (${country})...`, 'info')
+      const suggestions = await getKeywordSuggestions(appCompeteKey, selectedApp.id, country)
+      if (suggestions.length === 0) {
+        addLog(`AppCompete returned no suggestions for ${localeName}`, 'info')
+        return false
+      }
+
+      const currentKeywords = (localization.keywords || '').split(',').map(k => k.trim()).filter(Boolean)
+      for (const s of suggestions) {
+        s.selected = false
+        s.existing = currentKeywords.some(k => k.toLowerCase() === s.keyword.toLowerCase())
+      }
+
+      setAstroSuggestions({
+        locale,
+        localeName,
+        localizationId: localization.id,
+        currentKeywords: localization.keywords || '',
+        suggestions,
+        title: 'AppCompete Suggestions',
+      })
+      addLog(`AppCompete returned ${suggestions.length} keyword suggestions for ${localeName}`, 'success')
+      return true
+    } catch (error) {
+      addLog(`AppCompete suggestions failed for ${localeName}: ${error.message}`, 'error')
+      return false
+    }
+  }
+
+  const handleAppCompeteCompetitors = async (locale) => {
+    if (!appCompeteKey) return
+    setAppCompeteLoadingFor(`${locale}:competitors`)
+    try {
+      const { listApps } = await import('@/services/appCompeteService')
+      const apps = await listApps(appCompeteKey)
+      const competitors = apps.filter(a => String(a.appleId) !== String(selectedApp?.id))
+      if (competitors.length === 0) {
+        addLog('No competitor apps tracked on AppCompete — add them from your AppCompete dashboard', 'info')
+      } else {
+        setAppCompetePicker({ locale, apps: competitors })
+      }
+    } catch (error) {
+      addLog(`AppCompete: ${error.message}`, 'error')
+    }
+    setAppCompeteLoadingFor(null)
+  }
+
+  const handlePickCompetitor = async (app) => {
+    if (!appCompetePicker) return
+    const { locale } = appCompetePicker
+    const localization = versionLocalizations.find(l => l.locale === locale)
+    const localeInfo = ASC_LOCALES.find(l => l.code === locale)
+    const localeName = localeInfo?.name || locale
+    setAppCompetePicker(null)
+    setAppCompeteLoadingFor(`${locale}:competitors`)
+
+    try {
+      const { getAppKeywords, extractCompetitorKeywords } = await import('@/services/appCompeteService')
+      const country = countryFromLocale(locale)
+      addLog(`Fetching keywords of "${app.name}" from AppCompete...`, 'info')
+      // Tracked keywords first (richer: position + metrics); fall back to NLP mining.
+      let keywords = []
+      try { keywords = await getAppKeywords(appCompeteKey, app.appleId, country) } catch { /* fall through */ }
+      if (keywords.length === 0) {
+        keywords = await extractCompetitorKeywords(appCompeteKey, app.appleId, country)
+      }
+      if (keywords.length === 0) {
+        addLog(`No keywords found for "${app.name}"`, 'info')
+        setAppCompeteLoadingFor(null)
+        return
+      }
+
+      const currentKeywords = (localization?.keywords || '').split(',').map(k => k.trim()).filter(Boolean)
+      for (const s of keywords) {
+        s.selected = false
+        s.existing = currentKeywords.some(k => k.toLowerCase() === s.keyword.toLowerCase())
+      }
+
+      setAstroSuggestions({
+        locale,
+        localeName,
+        localizationId: localization?.id,
+        currentKeywords: localization?.keywords || '',
+        suggestions: keywords,
+        title: `Competitor — ${app.name}`,
+      })
+      addLog(`AppCompete returned ${keywords.length} keywords for "${app.name}"`, 'success')
+    } catch (error) {
+      addLog(`AppCompete competitor keywords failed: ${error.message}`, 'error')
+    }
+    setAppCompeteLoadingFor(null)
+  }
+
+  const handleReviewKeywords = async (locale) => {
+    if (!appCompeteKey || !selectedApp) return
+    const localization = versionLocalizations.find(l => l.locale === locale)
+    const localeInfo = ASC_LOCALES.find(l => l.code === locale)
+    const localeName = localeInfo?.name || locale
+    const current = (localization?.keywords || '').split(',').map(k => k.trim()).filter(Boolean)
+    if (current.length === 0) {
+      addLog(`No keywords to review for ${localeName}`, 'info')
+      return
+    }
+
+    setAppCompeteLoadingFor(`${locale}:review`)
+    try {
+      const { getAppKeywords, reviewKeywords } = await import('@/services/appCompeteService')
+      const country = countryFromLocale(locale)
+      addLog(`Reviewing ${current.length} keywords for ${localeName} via AppCompete...`, 'info')
+      const tracked = await getAppKeywords(appCompeteKey, selectedApp.id, country)
+      const items = reviewKeywords(current, tracked)
+      setKeywordReview({ locale, localeName, items })
+      const weak = items.filter(i => i.verdict === 'weak' || i.verdict === 'hard').length
+      addLog(`Keyword review for ${localeName}: ${weak} keyword(s) need attention`, weak > 0 ? 'info' : 'success')
+    } catch (error) {
+      addLog(`AppCompete review failed: ${error.message}`, 'error')
+    }
+    setAppCompeteLoadingFor(null)
+  }
+
+  const handleTrackKeywords = async (keywords) => {
+    if (!appCompeteKey || !selectedApp || keywords.length === 0) return
+    const locale = keywordReview?.locale
+    try {
+      const { addKeywords } = await import('@/services/appCompeteService')
+      await addKeywords(appCompeteKey, selectedApp.id, keywords, locale ? countryFromLocale(locale) : 'us')
+      addLog(`Now tracking ${keywords.length} keyword(s) on AppCompete`, 'success')
+      // Refresh the review with the newly tracked keywords
+      if (locale) await handleReviewKeywords(locale)
+    } catch (error) {
+      addLog(`AppCompete tracking failed: ${error.message}`, 'error')
+    }
+  }
+
   const generateKeywordsWithAI = async (locale, localization, localeName, country, description) => {
     if (!currentAiApiKey) {
       throw new Error('No AI API key configured')
@@ -564,6 +715,12 @@ Respond with ONLY the keywords, nothing else:`
     setGeneratingKeywordsFor(locale)
 
     try {
+      if (source === 'appcompete') {
+        await fetchAppCompeteSuggestions(locale, localization, localeName)
+        setGeneratingKeywordsFor(null)
+        return
+      }
+
       if (source !== 'ai') {
         const usedAstro = await fetchAstroSuggestions(locale, localization, localeName)
         if (usedAstro) {
@@ -1369,6 +1526,15 @@ ${sourceLoc.subtitle ? `Subtitle: ${sourceLoc.subtitle}` : ''}`
     astroSuggestions,
     setAstroSuggestions,
     handleApplyAstroSuggestions,
+    appCompetePicker,
+    setAppCompetePicker,
+    handleAppCompeteCompetitors,
+    handlePickCompetitor,
+    keywordReview,
+    setKeywordReview,
+    handleReviewKeywords,
+    handleTrackKeywords,
+    appCompeteLoadingFor,
     screenshotsByLocale,
     isLoadingScreenshots,
     expandedScreenshotLocales,

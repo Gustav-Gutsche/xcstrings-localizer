@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import React, { useEffect, useRef, useCallback, useMemo } from 'react';
 import { deviceDimensions } from '../constants';
 import { SELECT_SCREENSHOT, SET_SCREENSHOT_SETTING } from '../hooks/useAppState';
 import {
@@ -134,83 +134,31 @@ export default function CanvasArea({ state, dispatch, threeRenderer, getScreensh
   }, [use3D, threeRenderer, state.screenshots, state.selectedIndex, state.currentLanguage, state.defaults, getScreenshotImage]);
 
   // -----------------------------------------------------------------------
-  // updateCanvas – draws the main preview canvas
+  // renderSideCanvas – render a single screenshot to a side preview canvas
   // -----------------------------------------------------------------------
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+  const renderSideCanvas = useCallback(
+    (index, targetCanvas) => {
+      if (!targetCanvas) return;
+      const screenshot = state.screenshots[index];
+      if (!screenshot) return;
 
-    const ctx = canvas.getContext('2d');
+      renderScreenshotToCanvas(
+        targetCanvas,
+        screenshot,
+        dims.width,
+        dims.height,
+        state.currentLanguage,
+        state.projectLanguages,
+        threeRenderer
+      );
 
-    // Set internal resolution
-    canvas.width = dims.width;
-    canvas.height = dims.height;
-
-    // Scale for preview display
-    canvas.style.width = dims.width * previewScale + 'px';
-    canvas.style.height = dims.height * previewScale + 'px';
-
-    // If no screenshots, clear canvas and let the "no-screenshot" overlay show
-    if (state.screenshots.length === 0) {
-      ctx.clearRect(0, 0, dims.width, dims.height);
-      return;
-    }
-
-    // Draw background
-    const bg = getBackground(state);
-    drawBackgroundToContext(ctx, dims, bg);
-
-    // Draw noise overlay if enabled
-    if (bg.noise) {
-      drawNoiseToContext(ctx, dims, bg.noiseIntensity);
-    }
-
-    // Draw screenshot (2D) or 3D phone model
-    if (state.screenshots.length > 0) {
-      const ss = getScreenshotSettings(state);
-      const is3D = ss.use3D || false;
-
-      if (is3D && threeRenderer && typeof threeRenderer.renderToCanvas === 'function' && threeRenderer.isLoaded && threeRenderer.isLoaded()) {
-        // 3D mode – render to canvas with current screenshot settings
-        threeRenderer.renderToCanvas(canvas, dims.width, dims.height, ss);
-      } else if (!is3D) {
-        // 2D mode
-        const screenshot = state.screenshots[state.selectedIndex];
-        if (screenshot) {
-          const img = getScreenshotImage(screenshot);
-          if (img) {
-            drawScreenshotToContext(ctx, dims, img, ss);
-          }
-        }
-      }
-    }
-
-    // Draw text
-    const txt = getTextSettings(state);
-    drawTextToContext(ctx, dims, txt);
-
-    // Draw overlay/logo
-    const screenshot = state.screenshots[state.selectedIndex];
-    const overlay = screenshot?.overlay;
-    if (overlay) {
-      drawOverlayToContext(ctx, dims, overlay);
-    }
-
-    // Update side previews after main canvas is drawn
-    updateSidePreviews();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    state.screenshots,
-    state.selectedIndex,
-    state.outputDevice,
-    state.customWidth,
-    state.customHeight,
-    state.currentLanguage,
-    state.defaults,
-    dims,
-    previewScale,
-  ]);
+      // Apply preview scale to display size
+      targetCanvas.style.width = dims.width * previewScale + 'px';
+      targetCanvas.style.height = dims.height * previewScale + 'px';
+    },
+    [state, dims, previewScale, threeRenderer]
+  );
 
   // -----------------------------------------------------------------------
   // updateSidePreviews – renders adjacent screenshots to side canvases
@@ -279,35 +227,94 @@ export default function CanvasArea({ state, dispatch, threeRenderer, getScreensh
         farRightWrapper.classList.add('hidden');
       }
     },
-    [state, dims, previewScale]
+    [state, dims, previewScale, renderSideCanvas]
   );
 
   // -----------------------------------------------------------------------
-  // renderSideCanvas – render a single screenshot to a side preview canvas
+  // updateCanvas – draws the main preview canvas
   // -----------------------------------------------------------------------
 
-  const renderSideCanvas = useCallback(
-    (index, targetCanvas) => {
-      if (!targetCanvas) return;
-      const screenshot = state.screenshots[index];
-      if (!screenshot) return;
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
 
-      renderScreenshotToCanvas(
-        targetCanvas,
-        screenshot,
-        dims.width,
-        dims.height,
-        state.currentLanguage,
-        state.projectLanguages,
-        threeRenderer
-      );
+    const ctx = canvas.getContext('2d');
 
-      // Apply preview scale to display size
-      targetCanvas.style.width = dims.width * previewScale + 'px';
-      targetCanvas.style.height = dims.height * previewScale + 'px';
-    },
-    [state, dims, previewScale, threeRenderer]
-  );
+    // Set internal resolution
+    canvas.width = dims.width;
+    canvas.height = dims.height;
+
+    // Scale for preview display
+    canvas.style.width = dims.width * previewScale + 'px';
+    canvas.style.height = dims.height * previewScale + 'px';
+
+    // If no screenshots, clear canvas and let the "no-screenshot" overlay show
+    if (state.screenshots.length === 0) {
+      ctx.clearRect(0, 0, dims.width, dims.height);
+      return;
+    }
+
+    // Draw background
+    const bg = getBackground(state);
+    drawBackgroundToContext(ctx, dims, bg);
+
+    // Draw noise overlay if enabled
+    if (bg.noise) {
+      drawNoiseToContext(ctx, dims, bg.noiseIntensity);
+    }
+
+    // Draw screenshot (2D) or 3D phone model
+    if (state.screenshots.length > 0) {
+      const ss = getScreenshotSettings(state);
+      const is3D = ss.use3D || false;
+
+      if (is3D && threeRenderer && typeof threeRenderer.renderToCanvas === 'function' && threeRenderer.isLoaded && threeRenderer.isLoaded()) {
+        // 3D mode – render to canvas with current screenshot settings
+        threeRenderer.renderToCanvas(canvas, dims.width, dims.height, ss);
+      } else if (!is3D) {
+        // 2D mode
+        const screenshot = state.screenshots[state.selectedIndex];
+        if (screenshot) {
+          const img = getScreenshotImage(screenshot);
+          if (img) {
+            drawScreenshotToContext(ctx, dims, img, ss);
+          }
+        }
+      }
+    }
+
+    // Draw text
+    const txt = getTextSettings(state);
+    const txtWithLang = {
+      ...txt,
+      currentHeadlineLang: state.currentLanguage,
+      currentSubheadlineLang: state.currentLanguage,
+    };
+    drawTextToContext(ctx, dims, txtWithLang);
+
+    // Draw overlay/logo
+    const screenshot = state.screenshots[state.selectedIndex];
+    const overlay = screenshot?.overlay;
+    if (overlay) {
+      drawOverlayToContext(ctx, dims, overlay);
+    }
+
+    // Update side previews after main canvas is drawn
+    updateSidePreviews();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    state.screenshots,
+    state.selectedIndex,
+    state.outputDevice,
+    state.customWidth,
+    state.customHeight,
+    state.currentLanguage,
+    state.defaults,
+    dims,
+    previewScale,
+    updateSidePreviews,
+    getScreenshotImage,
+  ]);
 
   // -----------------------------------------------------------------------
   // slideToScreenshot – animated transition when clicking side previews

@@ -617,7 +617,11 @@ export function renderScreenshotToCanvas(canvas, screenshot, outputWidth, output
   }
 
   // Draw text
-  const txt = screenshot.text;
+  const txt = {
+    ...screenshot.text,
+    currentHeadlineLang: currentLanguage,
+    currentSubheadlineLang: currentLanguage,
+  };
   drawTextToContext(ctx, dims, txt);
 
   // Draw overlay/logo

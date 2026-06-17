@@ -244,15 +244,15 @@ Issues and PRs are welcome! Run `bun run lint` before submitting. The screenshot
         </a>
       </td>
       <td align="center">
-        <a href="https://github.com/isnine">
-          <img src="https://avatars.githubusercontent.com/u/16702489?v=4&s=100" width="72" alt="isnine" /><br />
-          <sub><b>isnine</b></sub>
-        </a>
-      </td>
-      <td align="center">
         <a href="https://github.com/jtaxiexpress">
           <img src="https://avatars.githubusercontent.com/u/86914073?v=4&s=100" width="72" alt="jtaxiexpress" /><br />
           <sub><b>jtaxiexpress</b></sub>
+        </a>
+      </td>
+      <td align="center">
+        <a href="https://github.com/isnine">
+          <img src="https://avatars.githubusercontent.com/u/16702489?v=4&s=100" width="72" alt="isnine" /><br />
+          <sub><b>isnine</b></sub>
         </a>
       </td>
     </tr>

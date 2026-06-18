@@ -186,6 +186,7 @@ export default function useAppStoreConnect({ credentials, onCredentialsChange, a
   const currentAiModel = aiConfig.models[aiConfig.provider] || PROVIDERS[aiConfig.provider]?.defaultModel || ''
 
   const [isCopyingSupportUrl, setIsCopyingSupportUrl] = useState(false)
+  const [isCopyingMarketingUrl, setIsCopyingMarketingUrl] = useState(false)
 
   useEffect(() => {
     const canAutoConnect = credentials.keyId && credentials.issuerId && hasValidToken(credentials.keyId, credentials.issuerId)
@@ -351,39 +352,44 @@ export default function useAppStoreConnect({ credentials, onCredentialsChange, a
     }
 
     setIsCopyingFromPrevious(true)
-    let copiedCount = 0
-    let errorCount = 0
+    try {
+      let copiedCount = 0
+      let errorCount = 0
 
-    for (const currentLoc of versionLocalizations) {
-      const prevLoc = previousVersionLocalizations.find(p => p.locale === currentLoc.locale)
-      if (!prevLoc) continue
+      for (const currentLoc of versionLocalizations) {
+        const prevLoc = previousVersionLocalizations.find(p => p.locale === currentLoc.locale)
+        if (!prevLoc) continue
 
-      const needsWhatsNew = !currentLoc.whatsNew && prevLoc.whatsNew
-      const needsPromoText = !currentLoc.promotionalText && prevLoc.promotionalText
+        const needsWhatsNew = !currentLoc.whatsNew && prevLoc.whatsNew
+        const needsPromoText = !currentLoc.promotionalText && prevLoc.promotionalText
 
-      if (needsWhatsNew || needsPromoText) {
-        const updateData = {}
-        if (needsWhatsNew) updateData.whatsNew = prevLoc.whatsNew
-        if (needsPromoText) updateData.promotionalText = prevLoc.promotionalText
+        if (needsWhatsNew || needsPromoText) {
+          const updateData = {}
+          if (needsWhatsNew) updateData.whatsNew = prevLoc.whatsNew
+          if (needsPromoText) updateData.promotionalText = prevLoc.promotionalText
 
-        try {
-          await updateVersionLocalization(credentials, currentLoc.id, updateData)
-          copiedCount++
-          addLog(`Copied to ${currentLoc.locale}: ${needsWhatsNew ? 'What\'s New' : ''}${needsWhatsNew && needsPromoText ? ' & ' : ''}${needsPromoText ? 'Promo Text' : ''}`, 'success')
-        } catch (error) {
-          errorCount++
-          addLog(`Failed to copy to ${currentLoc.locale}: ${error.message}`, 'error')
+          try {
+            await updateVersionLocalization(credentials, currentLoc.id, updateData)
+            copiedCount++
+            addLog(`Copied to ${currentLoc.locale}: ${needsWhatsNew ? 'What\'s New' : ''}${needsWhatsNew && needsPromoText ? ' & ' : ''}${needsPromoText ? 'Promo Text' : ''}`, 'success')
+          } catch (error) {
+            errorCount++
+            addLog(`Failed to copy to ${currentLoc.locale}: ${error.message}`, 'error')
+          }
         }
       }
-    }
 
-    if (copiedCount > 0) {
-      const versionLocs = await getVersionLocalizations(credentials, selectedVersion.id)
-      setVersionLocalizations(versionLocs)
-    }
+      if (copiedCount > 0) {
+        const versionLocs = await getVersionLocalizations(credentials, selectedVersion.id)
+        setVersionLocalizations(versionLocs)
+      }
 
-    addLog(`Copied content to ${copiedCount} locale(s)${errorCount > 0 ? `, ${errorCount} error(s)` : ''}`, copiedCount > 0 ? 'success' : 'error')
-    setIsCopyingFromPrevious(false)
+      addLog(`Copied content to ${copiedCount} locale(s)${errorCount > 0 ? `, ${errorCount} error(s)` : ''}`, copiedCount > 0 ? 'success' : 'error')
+    } catch (error) {
+      addLog(`Error copying from previous version: ${error.message}`, 'error')
+    } finally {
+      setIsCopyingFromPrevious(false)
+    }
   }
 
   const localesNeedingCopy = versionLocalizations.filter(loc => {
@@ -1239,35 +1245,82 @@ Respond with ONLY the keywords, nothing else:`
     }
 
     setIsCopyingSupportUrl(true)
-    let copiedCount = 0
-    let errorCount = 0
+    try {
+      let copiedCount = 0
+      let errorCount = 0
 
-    for (const loc of versionLocalizations) {
-      if (loc.locale === sourceLocale) continue
-      if (loc.supportUrl === sourceLoc.supportUrl) continue
+      for (const loc of versionLocalizations) {
+        if (loc.locale === sourceLocale) continue
+        if (loc.supportUrl === sourceLoc.supportUrl) continue
 
-      try {
-        await updateVersionLocalization(credentials, loc.id, {
-          supportUrl: sourceLoc.supportUrl
-        })
-        copiedCount++
-      } catch (error) {
-        errorCount++
-        addLog(`Failed to copy Support URL to ${loc.locale}: ${error.message}`, 'error')
+        try {
+          await updateVersionLocalization(credentials, loc.id, {
+            supportUrl: sourceLoc.supportUrl
+          })
+          copiedCount++
+        } catch (error) {
+          errorCount++
+          addLog(`Failed to copy Support URL to ${loc.locale}: ${error.message}`, 'error')
+        }
       }
+
+      if (copiedCount > 0) {
+        addLog(`Copied Support URL to ${copiedCount} locale(s)`, 'success')
+        const versionLocs = await getVersionLocalizations(credentials, selectedVersion.id)
+        setVersionLocalizations(versionLocs)
+      }
+
+      if (errorCount > 0) {
+        addLog(`${errorCount} error(s) while copying Support URL`, 'error')
+      }
+    } catch (error) {
+      addLog(`Failed to copy Support URL: ${error.message}`, 'error')
+    } finally {
+      setIsCopyingSupportUrl(false)
+    }
+  }
+
+  const handleCopyMarketingUrl = async () => {
+    const sourceLoc = versionLocalizations.find(l => l.locale === sourceLocale)
+    if (!sourceLoc?.marketingUrl) {
+      addLog(`No Marketing URL found in source locale (${sourceLocale})`, 'error')
+      return
     }
 
-    if (copiedCount > 0) {
-      addLog(`Copied Support URL to ${copiedCount} locale(s)`, 'success')
-      const versionLocs = await getVersionLocalizations(credentials, selectedVersion.id)
-      setVersionLocalizations(versionLocs)
-    }
+    setIsCopyingMarketingUrl(true)
+    try {
+      let copiedCount = 0
+      let errorCount = 0
 
-    if (errorCount > 0) {
-      addLog(`${errorCount} error(s) while copying Support URL`, 'error')
-    }
+      for (const loc of versionLocalizations) {
+        if (loc.locale === sourceLocale) continue
+        if (loc.marketingUrl === sourceLoc.marketingUrl) continue
 
-    setIsCopyingSupportUrl(false)
+        try {
+          await updateVersionLocalization(credentials, loc.id, {
+            marketingUrl: sourceLoc.marketingUrl
+          })
+          copiedCount++
+        } catch (error) {
+          errorCount++
+          addLog(`Failed to copy Marketing URL to ${loc.locale}: ${error.message}`, 'error')
+        }
+      }
+
+      if (copiedCount > 0) {
+        addLog(`Copied Marketing URL to ${copiedCount} locale(s)`, 'success')
+        const versionLocs = await getVersionLocalizations(credentials, selectedVersion.id)
+        setVersionLocalizations(versionLocs)
+      }
+
+      if (errorCount > 0) {
+        addLog(`${errorCount} error(s) while copying Marketing URL`, 'error')
+      }
+    } catch (error) {
+      addLog(`Failed to copy Marketing URL: ${error.message}`, 'error')
+    } finally {
+      setIsCopyingMarketingUrl(false)
+    }
   }
 
   const handleAppInfoChange = (locId, field, value) => {
@@ -1281,14 +1334,14 @@ Respond with ONLY the keywords, nothing else:`
   }
 
   const getAppInfoValue = (loc, field) => {
-    if (editedAppInfo[loc.id]?.hasOwnProperty(field)) {
+    if (editedAppInfo[loc.id] && Object.prototype.hasOwnProperty.call(editedAppInfo[loc.id], field)) {
       return editedAppInfo[loc.id][field]
     }
     return loc[field] || ''
   }
 
   const isFieldEdited = (locId, field) => {
-    return editedAppInfo[locId]?.hasOwnProperty(field)
+    return editedAppInfo[locId] && Object.prototype.hasOwnProperty.call(editedAppInfo[locId], field)
   }
 
   const hasAppInfoChanges = Object.keys(editedAppInfo).length > 0
@@ -1555,6 +1608,7 @@ ${sourceLoc.subtitle ? `Subtitle: ${sourceLoc.subtitle}` : ''}`
     currentAiApiKey,
     currentAiModel,
     isCopyingSupportUrl,
+    isCopyingMarketingUrl,
     handleTestConnection,
     handleAppSelect,
     handleVersionSelect,
@@ -1578,6 +1632,7 @@ ${sourceLoc.subtitle ? `Subtitle: ${sourceLoc.subtitle}` : ''}`
     handleEditLocalization,
     handleSaveEdit,
     handleCopySupportUrl,
+    handleCopyMarketingUrl,
     handleAppInfoChange,
     getAppInfoValue,
     isFieldEdited,
